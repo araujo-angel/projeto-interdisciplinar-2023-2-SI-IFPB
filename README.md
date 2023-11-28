@@ -1,25 +1,43 @@
-# projeto-interdisciplinar-2023-2-SI-IFPB
+<h1 align="center">PROJETO INTERDISCIPLINAR</h1>
 
-*Título do projeto:* Sistema de compras para uma livraria;
 
-*Autores:* 
-=======
-# projeto-interdisciplinar-2023.2-SI-IFPB
-Este projeto está sendo desenvolvido entre as disciplinas de Estrutura de Dados, Sistemas Operacionais e Protocolos de Interconexão de Redes, no curso de Sistemas para Internet no Instituto Federal da Paraíba.
-Grupo: 
-Ananda Guedes do Ó
-Angêlica Rita de Araújo
-Léticia Leite Batista;
+`"Livraria Virtual"` - Aplicação que simula um sistema de compra de livros. 
 
-*Disciplinas:* Estrutura de dados - Alex Sandro Cunha, Sistemas Operacionais - Gustavo Wagner e Protocolos de Aplicacao - Leonidas;
+## Requisitos
++ `Python 3`
++ `VS Code`
 
-*Descrição do problema:* ;
+## Instalação
+1. Instale `Python 3` na sua máquina (caso não tenha).
+2. Baixe ou clone o projeto para o seu computador.
+3. Abra o terminal ou prompt de comando e navegue até o diretório do projeto.
+4. Execute o comando `pip install numpy` para instalar as bibliotecas necessárias.
+5. Inicie o programa executando o arquivo `Livraria.py` e `Pedido.py`.
 
-*Arquivos do Projeto:* ;
+## Uso
+> Este projeto está sendo desenvolvido entre as disciplinas de Estrutura de Dados, Sistemas Operacionais e Protocolos de Interconexão de Redes, no curso de Sistemas para Internet no Instituto Federal da Paraíba. Veja o arquivo [Especificações do projeto](https://docs.google.com/document/d/1FZBZ8_yj2_KbW5qPUHh2yBUGZ-x6_cQPvE1VKb37pR0/edit?usp=sharing) para conferir os detalhes.
 
-*Pré-requisitos para execução:* ;
 
-*Protocolo da Aplicação:* ;
+## Exigências
++ `Estruturas de Dados: ` Lista, Fila e Hash Table
++ `Protocolos de Redes: ` TCP
++ `Sistemas Operacionais: ` Threads e Semáforo (Lock)
 
-*Instruções para execução:* ;
 
+## Descrição do arquivo
+| Nome | Descrição |
+| ------ | ----------- |
+| Livraria.py | Este é o arquivo onde está o servidor.|
+| Pedido.py | Este é o arquivo onde está o cliente.|
+| EstoqueDeLivros.py | Este é o arquivo onde estão os livros.|
+| Cliente.py | Este é o arquivo onde está a Classe Cliente, com seus respectivos métodos e atributos.|
+| ListaEncadeadaOrdenada.py | Este é o arquivo onde a estrutura de dados lista é definida. Esta estrutura de dados é utilizada no Pedido.py. |
+| FilaSequencialCircular.py | Este é o arquivo onde a estrutura de dados fila é definida. Esta estrutura de dados é utilizada na Livraria.py. |
+| ChainingHashTable.py | Este é o arquivo onde a estrutura de dados hash é definida. Esta estrutura de dados é utilizada no Pedido.py. |
+
+
+### 📝 Alunas
+
+- [Ananda Guedes](https://github.com/agu3des)
+- [Angêlica Araújo](https://github.com/araujo-angel)
+- [Letícia Leite](https://github.com/l-e-t-i-c-i-a)
