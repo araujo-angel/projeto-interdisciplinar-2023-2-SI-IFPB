@@ -28,7 +28,7 @@
 | Nome | Descrição |
 | ------ | ----------- |
 | Livraria.py | Este é o arquivo onde está o servidor.|
-| Pedido.py | Este é o arquivo onde está o cliente.|
+| Pedido.py | Este é o arquivo onde é realizado a compra pelo cliente.|
 | EstoqueDeLivros.py | Este é o arquivo onde estão os livros.|
 | Cliente.py | Este é o arquivo onde está a Classe Cliente, com seus respectivos métodos e atributos.|
 | ListaEncadeadaOrdenada.py | Este é o arquivo onde a estrutura de dados lista é definida. Esta estrutura de dados é utilizada no Pedido.py. |
