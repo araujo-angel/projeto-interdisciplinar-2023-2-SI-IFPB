@@ -1,4 +1,4 @@
 """
 Classe referente ao processo de compra dos livros.
 """
-from ListaEncadeadaOrdenada import Lista
+from DataStructure.ListaEncadeadaOrdenada import Lista

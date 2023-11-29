@@ -1,7 +1,7 @@
 """
 Arquivo referente ao servidor da aplicação, ou seja, a livraria.
 """
-from FilaSequencialCircularNumPy import Fila, FilaException
+from DataStructure.FilaSequencialCircular import Fila, FilaException
 import threading
 import socket
 import os
@@ -10,7 +10,7 @@ import platform
 
 HOST = '0.0.0.0'
 PORTA = 41800
-# cmd_server = ['SENT_MENU', 'SEND_OK', 'QUIT_OK']
+cmd_server = ['SENT_MENU', 'SEND_OK', 'QUIT_OK']
 
 pedidos = Fila()
 total = 0
@@ -20,8 +20,8 @@ lock = threading.Lock()
 def MenuLivros():
     limpaTerminal()
     escolha = ''
-    print("===Área da Pizzaria===")
-    print('1 - Abrir pizzaria')
+    print("*****LIVRARIA*****")
+    print('1 - Abrir Livraria')
     print("2 - Exibir pedidos")
     print("3 - Sair")
     escolha = input('Selecione uma opção: ')
@@ -38,8 +38,8 @@ def processarCliente(con, cliente):
 
         if msgDecodificada[0] == 'GET_MENU':
             cardapio_view = f'{cmd_server[0]}\n'
-            for item in cardapio:
-                cardapio_view += f'{item},{cardapio[item]:.2f}*'
+            for item in EstoqueDeLivros:
+                cardapio_view += f'{item},{EstoqueDeLivros[item]:.2f}*'
             cardapio_view = cardapio_view[:-1]
             con.send(str.encode(cardapio_view))
 
@@ -76,7 +76,7 @@ servidor = (HOST, PORTA)
 sock.bind(servidor)
 sock.listen(50)
 
-escolha = menuPizzaria()
+escolha = MenuLivros()
 
 if escolha == '1':
     con, cliente = sock.accept()
@@ -85,7 +85,7 @@ if escolha == '1':
     escolha = 0
     while escolha != '3':
         if escolha == '1':
-            print('\nA pizzaria já está aberta!')
+            print('\nA livraria já está funcionando!')
             input()
             pass
         elif escolha == '2':
@@ -106,7 +106,7 @@ if escolha == '1':
                         input()
                     
 
-        escolha = menuPizzaria()
+        escolha = MenuLivros()
 
 print("Encerrando servidor...")
 sock.close()
