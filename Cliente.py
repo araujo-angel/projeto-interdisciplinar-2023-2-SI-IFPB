@@ -48,6 +48,8 @@ class Cliente:
     def setCep(self, novoCep):
         self.__cep = novoCep
 
+    def cadastraCliente(self, cpf)
+
     def setPagamento(self, formaPagamento):
         if formaPagamento == '1':
             self.__pagamento = 'Cartão'

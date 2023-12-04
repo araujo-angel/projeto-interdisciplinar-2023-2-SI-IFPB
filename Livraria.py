@@ -5,25 +5,25 @@ from DataStructure.FilaSequencialCircular import Fila, FilaException
 import threading
 import socket
 import os
-from EstoqueDeLivros import *
+from Livros import *
 import platform
 
 HOST = '0.0.0.0'
-PORTA = 41800
-cmd_server = ['SENT_MENU', 'SEND_OK', 'QUIT_OK']
+PORTA = 4000
+cmd_server = ['SENT_BOOKS', 'BUY_SUCESS_OK', 'QUIT_OK']
 
 pedidos = Fila()
 total = 0
 lock = threading.Lock()
 
 
-def MenuLivros():
+def EstantedeLivros():
     limpaTerminal()
     escolha = ''
     print("*****LIVRARIA*****")
-    print('1 - Abrir Livraria')
-    print("2 - Exibir pedidos")
-    print("3 - Sair")
+    print('1 - Abrir livraria')
+    print("2 - Exibir lista de comprar")
+    print("3 - Encerrar")
     escolha = input('Selecione uma opção: ')
     return escolha
 
@@ -36,14 +36,14 @@ def processarCliente(con, cliente):
         msgDecodificada = mensagem.decode()
         msgDecodificada = msgDecodificada.split('/')
 
-        if msgDecodificada[0] == 'GET_MENU':
+        if msgDecodificada[0] == 'GET_BOOKS':
             cardapio_view = f'{cmd_server[0]}\n'
             for item in EstoqueDeLivros:
                 cardapio_view += f'{item},{EstoqueDeLivros[item]:.2f}*'
             cardapio_view = cardapio_view[:-1]
             con.send(str.encode(cardapio_view))
 
-        elif msgDecodificada[0] == "SEND":
+        elif msgDecodificada[0] == "BUY_SUCESS":
             lock.acquire()
             try:
                 pedidos.enfileira(msgDecodificada[1])
@@ -51,12 +51,12 @@ def processarCliente(con, cliente):
                 # Libera o bloqueio após a inserção na fila
                 lock.release()
             msg = f'{cmd_server[1]}/\n'
-            msg += f'Recebemos seu pedido com sucesso!\n{msgDecodificada[1]}'
+            msg += f'20O - Compra realizada com sucesso.\n{msgDecodificada[1]}'
             con.send(str.encode(msg))
 
         elif msgDecodificada[0] == 'QUIT':
             msg = f'{cmd_server[2]}/\n'
-            msg += 'Xau xau! Volte sempre que estiver com fome!'
+            msg += '204 - Desconecção efetuada com sucesso.'
             con.send(str.encode(msg))
 
     print("Desconectando do cliente", cliente)
@@ -67,8 +67,6 @@ def limpaTerminal():
         os.system('cls')
     else:
         os.system('clear')
-
-
 
    
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
