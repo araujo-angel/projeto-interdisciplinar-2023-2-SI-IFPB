@@ -1,0 +1,2 @@
+"A metamorfose", 8571646856, "Franz Kafka", 10
+"A Revolução Dos Bichos", 8535909559, "George Orwell", 20
