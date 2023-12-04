@@ -5,23 +5,17 @@ As mensagens descritas abaixo são enviadas pelo cliente ao servidor através do
 O servidor processa as mensagens recebidas através do método processa_msg.
 O servidor envia as respostas ao cliente utilizando o método send do socket.
 
-REGISTRAR <cpf> - Solicita ao servidor o registro de um novo cliente
+GET_BOOKS <cpf> - Solicita ao servidor o catálogo de livros
 Parâmetros:
-<cpf>: CPF do cliente.CPF do cliente que quer se registrar
 Resposta do Servidor:
-200 - Caso o cliente seja um novo cliente, e tenha se registrado com sucesso
-201 - Caso o cliente seja um cliente já registrado, e tenha se autenticado novamente com sucesso
+
 
 COMPRAR <numero> - Solicita ao servidor a compra de um número de rifa específico.
-Parâmetros:
-<numero>: Número de rifa desejado.
-Resposta do Servidor:
-202 - Compra do número realizada com sucesso.
-401 - Número não estiver disponível
-400 - Número inválido
 
-SAIR - Solicita ao servidor encerrar a conexão.
+20O - Compra realizada com sucesso.
+
+QUIT - Solicita ao servidor encerrar a conexão.
 Parâmetros: Nenhum.
 Resposta do Servidor:
-204 - Caso a desconexão tenha sido bem sucedida
+204 - Desconecção efetuada com sucesso.
 

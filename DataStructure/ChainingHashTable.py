@@ -32,8 +32,7 @@ class ChainingHashTable:
     def __init__(self, size:int=100):
         '''
         Construtor da classe que recebe o tamanho para a tabela de dispersão.
-        Utiliza um list de python como estrutura encadeda para armazenar os
-        elementos mapeados para um slot correpondente.
+        Utiliza um list de python como estrutura encadeda para armazenar os elementos mapeados para um slot correpondente.
         Argumentos:
             size(int): tamanho da tabela de dispersão. Se não informar, 
             o tamanho padrão é 100.
