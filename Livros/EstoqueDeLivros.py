@@ -3,7 +3,6 @@ from DataStructure.ChainingHashTable import *
 
 class EstoqueDeLivros:
     def __init__(self):
-        self.__qtdNoEstoque = 0
         self.__livros = ChainingHashTable()
 
     def cadastrarLivroDoArquivo(self, nome_arquivo):
