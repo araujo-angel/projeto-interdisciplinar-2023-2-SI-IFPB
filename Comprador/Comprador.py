@@ -1,20 +1,21 @@
+from DataStructure.ChainingHashTable import *
 
-class ClienteException(Exception):
+class CompradorException(Exception):
     '''
     Classe referente ao tratamento de erros.
     '''
     def __init__(self, msg):
         super().__init__(msg)
 
-class Cliente:
+class Comprador:
     """
-    Classe referente aos dados do cliente.
+    Classe referente aos dados do comprador.
     """
-    def __init__(self):
-        self.__cpf = None
-        self.__nome = None
-        self.__telefone = None
-        self.__cep = None
+    def __init__(self, cpf:str, nome:str, telefone:int, cep:int):
+        self.__cpf = cpf
+        self.__nome = nome
+        self.__telefone = telefone
+        self.__cep = cep
         self.__pagamento = None
         self.__troco = None
 
@@ -59,5 +60,3 @@ class Cliente:
 
     def __str__(self):
         return f'CPF: {self.__cpf} | Nome: {self.__nome} | Telefone: {self.__telefone} | CEP: {self.__cep} | {self.__pagamento} | Troco: {self.__troco}'
-    
-    #cadastra em um arquivo txt e carrega para o programa

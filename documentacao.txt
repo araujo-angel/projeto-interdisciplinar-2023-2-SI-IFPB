@@ -3,16 +3,16 @@ Nele, utilizamos como Protocolo da camada de Transporte o TCP, como também trab
 
 As mensagens descritas abaixo são enviadas pelo cliente ao servidor através do método enviar_msg.
 O servidor processa as mensagens recebidas através do método processa_msg.
-O servidor envia as respostas ao cliente utilizando o método send do socket.
+O servidor envia as respostas ao cliente utilizando o método send to socket.
 
-GET_BOOKS <cpf> - Solicita ao servidor o catálogo de livros
+GET_BOOKS <livro> - Solicita ao servidor o catálogo de livros
 Parâmetros:
 Resposta do Servidor:
 
 
-COMPRAR <numero> - Solicita ao servidor a compra de um número de rifa específico.
+COMPRAR <numero> - Solicita ao servidor a compra de um ou mais livros.
 
-20O - Compra realizada com sucesso.
+200 - Compra realizada com sucesso.
 
 QUIT - Solicita ao servidor encerrar a conexão.
 Parâmetros: Nenhum.

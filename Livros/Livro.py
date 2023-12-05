@@ -30,4 +30,4 @@ class Livros:
         self.__qtdDeLivros = novoQtdDeLivros
 
     def __str__(self):
-        return f"{self.titulo} (ISBN: {self.isbn}, Autor: {self.autor}, Quantidade: {self.qtdDeLivros})"
+        return f"{self.__titulo} (ISBN: {self.__isbn}, Autor: {self.__autor}, Quantidade: {self.__qtdDeLivros})"
