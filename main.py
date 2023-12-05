@@ -9,12 +9,12 @@ estoque = EstoqueDeLivros()
 #estoque.cadastrarLivro("A hora da Estrela", 4567890234, "Clarice Lispector", 11)
 
 
-estoque.cadastrarLivroDoArquivo('livros.txt')
+estoque.cadastrarLivroDoArquivo('Livros\Livros.txt')
 
 print(estoque)
 
-isbn_a_decrementar = 8535909559
-quantidade_a_decrementar = 5
+isbn_a_decrementar = 7439874262
+quantidade_a_decrementar = 2
 
 estoque.decrementarQuantidadeLivros(isbn_a_decrementar, quantidade_a_decrementar)
 print(estoque)
@@ -26,3 +26,13 @@ cliente = CompradoresCadastrados()
 cliente.cadastrarCompradorDoArquivo('Comprador\Compradores.txt')
 
 print(cliente)
+
+#cpf_a_verificar = "12345678901"
+cpf_a_verificar = "87654325666"
+
+if cliente.verificarClienteCadastrado(cpf_a_verificar):
+    print("Cliente cadastrado.")
+    # Faça outras operações relacionadas a clientes
+else:
+    print("Cliente não cadastrado.")
+    # Realize operações apropriadas para lidar com clientes não cadastrados
