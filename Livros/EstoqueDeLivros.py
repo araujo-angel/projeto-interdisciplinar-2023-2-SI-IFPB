@@ -1,9 +1,14 @@
 from Livros import Livros
 from DataStructure.ChainingHashTable import *
 
+"""
+Classe que controla a quantidade de livros da aplicação.
+"""
+
 class EstoqueDeLivros:
     def __init__(self):
         self.__livros = ChainingHashTable()
+        #self.__qtdNoEstoque = 0
 
     def cadastrarLivroDoArquivo(self, nome_arquivo):
         try:
@@ -32,7 +37,7 @@ class EstoqueDeLivros:
     def cadastrarLivro(self, titulo, isbn, autor, qtdDeLivros):
         novoLivro = Livros(titulo, isbn, autor, qtdDeLivros)
         self.__livros.put(novoLivro.getIsbn(), novoLivro)
-        self.__qtdNoEstoque += qtdDeLivros
+        #self.__qtdNoEstoque += qtdDeLivros
 
         return self.__livros.get(isbn)
     
@@ -53,12 +58,12 @@ class EstoqueDeLivros:
 
         except Exception as e:
             print(f"Erro ao decrementar a quantidade de livros: {e}")
-    
+
     def atualizarArquivoLivros(self, nome_arquivo):
         try:
             with open(nome_arquivo, 'w', encoding='utf-8') as arquivo:
-                for livro in self.__livros.values():
-                    linha = f'"{livro.getTitulo()}", {livro.getIsbn()}, "{livro.getAutor()}", {livro.getQtdDeLivros()}\n'
+                for isbn, livro in self.__livros.items():
+                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", {livro.getQtdDeLivros()}\n'
                     arquivo.write(linha)
 
             print("Arquivo 'livros.txt' atualizado com sucesso.")
@@ -68,8 +73,4 @@ class EstoqueDeLivros:
     
     def __str__(self):
         livros_str = "\n".join(str(livro) for livro in self.__livros.values())
-        return f"Quantidade no Estoque: {self.__qtdNoEstoque}\nLivros no Estoque:\n{livros_str}"
-
-
-
-
+        return f"Quantidade no Estoque: {self.__livros.__len__()}\nLivros no Estoque:\n{livros_str}"

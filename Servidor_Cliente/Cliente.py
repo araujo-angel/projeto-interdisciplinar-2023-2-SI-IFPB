@@ -1,10 +1,10 @@
-"""
-Arquivo referente ao cliente da aplicação, ou seja, o comprador.
-"""
-
 import socket
 import os
 import sys
+
+"""
+Arquivo referente ao cliente da aplicação, ou seja, o individuo comprador.
+"""
 
 
 
