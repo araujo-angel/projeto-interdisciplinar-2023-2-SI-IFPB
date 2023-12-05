@@ -1,4 +1,4 @@
-from Livros import Livros
+from Livros.Livro import *
 from DataStructure.ChainingHashTable import *
 
 """
@@ -49,7 +49,7 @@ class EstoqueDeLivros:
                 quantidade_atual = livro.getQtdDeLivros()
                 if quantidade_atual >= quantidade:
                     livro.setQtdDeLivros(quantidade_atual - quantidade)
-                    self.__qtdNoEstoque -= quantidade
+                    #self.__qtdNoEstoque -= quantidade
                     print(f"Quantidade de '{livro.getTitulo()}' decrementada em {quantidade}. Nova quantidade: {livro.getQtdDeLivros()}")
                 else:
                     print(f"Erro: Não há quantidade suficiente de '{livro.getTitulo()}' para decrementar.")
@@ -66,7 +66,7 @@ class EstoqueDeLivros:
                     linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", {livro.getQtdDeLivros()}\n'
                     arquivo.write(linha)
 
-            print("Arquivo 'livros.txt' atualizado com sucesso.")
+            print(f"Arquivo {nome_arquivo} atualizado com sucesso.")
         except Exception as e:
             print(f"Erro ao atualizar o arquivo: {e}")
 

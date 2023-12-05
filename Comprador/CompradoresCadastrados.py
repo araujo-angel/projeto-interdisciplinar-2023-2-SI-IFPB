@@ -34,6 +34,13 @@ class CompradoresCadastrados:
 
         return self.__compradores.get(cpf)
     
+    def verificarClienteCadastrado(self, cpf):
+        """
+        Verifica se um cliente está cadastrado.
+        Retorna True se o cliente estiver cadastrado e False caso contrário.
+        """
+        return cpf in self.__compradores
+    
     def __str__(self):
         compradores_str = "\n".join(str(cliente) for cliente in self.__compradores.values())
         return f"\nCompradores cadastrados:\n{compradores_str}"
