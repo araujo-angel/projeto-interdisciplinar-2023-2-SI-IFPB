@@ -1,8 +1,9 @@
-from Livros.Livro import *
+from Livros import Livros
 from DataStructure.ChainingHashTable import *
 
 class EstoqueDeLivros:
     def __init__(self):
+        self.__qtdNoEstoque = 0
         self.__livros = ChainingHashTable()
 
     def cadastrarLivroDoArquivo(self, nome_arquivo):
@@ -68,7 +69,7 @@ class EstoqueDeLivros:
     
     def __str__(self):
         livros_str = "\n".join(str(livro) for livro in self.__livros.values())
-        return f"Quantidade no Estoque: {self.__livros.__len__}\nLivros no Estoque:\n{livros_str}"
+        return f"Quantidade no Estoque: {self.__qtdNoEstoque}\nLivros no Estoque:\n{livros_str}"
 
 
 
