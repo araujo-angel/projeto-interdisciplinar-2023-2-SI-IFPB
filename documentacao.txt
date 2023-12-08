@@ -11,9 +11,13 @@ Resposta do Servidor: 201 - Pode realizar a compra.
 
 BUY_SUCESS <numero> - Solicita ao servidor a compra de um ou mais livros.
 Parâmetros:
-Resposta do Servidor: 200 - Compra realizada com sucesso.
+Resposta do Servidor: 
+200 - Cliente encontrado com sucesso!
+201 - Pedido registrado com sucesso!
+400 - Cliente não encontrado.
+401 - Este livro não está disponível no estoque.
 
 QUIT - Solicita ao servidor encerrar a conexão.
 Parâmetros: Nenhum.
-Resposta do Servidor: 204 - Desconecção efetuada com sucesso.
+Resposta do Servidor: 204 - Desconexão efetuada com sucesso.
 

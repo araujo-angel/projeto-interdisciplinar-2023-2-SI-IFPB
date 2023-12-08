@@ -23,10 +23,11 @@ class EstoqueDeLivros:
                     titulo = atributos[0].strip(' "')
                     isbn = int(atributos[1].strip())
                     autor = atributos[2].strip(' "')
-                    qtdDeLivros = int(atributos[3].strip())
+                    preco = int(atributos[3].strip())
+                    qtdDeLivros = int(atributos[4].strip())
 
                     # Chamar o método cadastrarLivro para cada linha
-                    resultado = self.cadastrarLivro(titulo, isbn, autor, qtdDeLivros)
+                    resultado = self.cadastrarLivro(titulo, isbn, autor, preco, qtdDeLivros)
                     print(resultado)
 
             print("Cadastro de livros concluído.")
@@ -34,8 +35,8 @@ class EstoqueDeLivros:
             print(f"Erro ao ler o arquivo: {e}")
  
 
-    def cadastrarLivro(self, titulo, isbn, autor, qtdDeLivros):
-        novoLivro = Livros(titulo, isbn, autor, qtdDeLivros)
+    def cadastrarLivro(self, titulo, isbn, autor, preco, qtdDeLivros):
+        novoLivro = Livros(titulo, isbn, autor, preco, qtdDeLivros)
         self.__livros.put(novoLivro.getIsbn(), novoLivro)
         #self.__qtdNoEstoque += qtdDeLivros
 
@@ -63,7 +64,7 @@ class EstoqueDeLivros:
         try:
             with open(nome_arquivo, 'w', encoding='utf-8') as arquivo:
                 for isbn, livro in self.__livros.items():
-                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", {livro.getQtdDeLivros()}\n'
+                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", "{livro.getPreco()}", {livro.getQtdDeLivros()}\n'
                     arquivo.write(linha)
 
             print(f"Arquivo {nome_arquivo} atualizado com sucesso.")

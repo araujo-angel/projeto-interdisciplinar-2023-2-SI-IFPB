@@ -1,110 +1,143 @@
-"""
-Arquivo referente ao servidor da aplicação, ou seja, a livraria.
-"""
-from DataStructure.FilaSequencialCircular import Fila, FilaException
-import threading
 import socket
-import os
-from Livros import *
-import platform
-
-HOST = '0.0.0.0'
-PORTA = 4000
-cmd_server = ['SENT_BOOKS', 'BUY_SUCESS_OK', 'QUIT_OK']
-
-pedidos = Fila()
-total = 0
-lock = threading.Lock()
+import threading
+from Livros.EstoqueDeLivros import *
+from DataStructure.ListaEncadeadaOrdenada import *
+from Comprador.CompradoresCadastrados import *
 
 
-def EstantedeLivros():
-    limpaTerminal()
-    escolha = ''
-    print("*****LIVRARIA*****")
-    print('1 - Abrir livraria')
-    print("2 - Exibir lista de comprar")
-    print("3 - Encerrar")
-    escolha = input('Selecione uma opção: ')
-    return escolha
+class Server:
+    '''
+    Classe responsável por gerenciar as conexões dos clientes
+    '''    
+    def __init__(self, host, port, message_size):
+        self.__host = host
+        self.__port = port
+        self.__server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__estoque = EstoqueDeLivros()
+        self.__max_message_size = message_size
+        self.__lock_compradores = threading.Lock()
+        self.__lock_livros = threading.Lock()
+        self.__compradores = CompradoresCadastrados()
+        self.__pedidos = Lista()
 
-def processarCliente(con, cliente):
-    global total
-    while True:
-        mensagem = con.recv(1024)
-        if not mensagem:
-            break
-        msgDecodificada = mensagem.decode()
-        msgDecodificada = msgDecodificada.split('/')
+    # Inicia o servidor
+    def start(self):
+        self.__server_socket.bind((self.__host, self.__port))
+        self.__server_socket.listen(1)
+        print(f"Servidor aguardando conexões em {self.__host}:{self.__port}")
+        
+        try:
+            self.accept_connections()
+        except KeyboardInterrupt:
+            self.__server_socket.close() # Fecha socket do servidor quando clicar CTRL C
 
-        if msgDecodificada[0] == 'GET_BOOKS':
-            cardapio_view = f'{cmd_server[0]}\n'
-            for item in EstoqueDeLivros:
-                cardapio_view += f'{item},{EstoqueDeLivros[item]:.2f}*'
-            cardapio_view = cardapio_view[:-1]
-            con.send(str.encode(cardapio_view))
+    # Trata as conexões dos clientes
+    def accept_connections(self):
+        while True:
+            client_socket, address = self.__server_socket.accept()
+            print("Cliente conectado:", address)
 
-        elif msgDecodificada[0] == "BUY_SUCESS":
-            lock.acquire()
+            client_thread = threading.Thread(target=self.handle_client, args=(client_socket,))
+            client_thread.start()
+
+    # Comunicação com o cliente/ respostas para o cliente
+    def handle_client(self, client_socket):
+        client_socket.send("Bem-vindo à compra de rifa!".encode())
+        cpf_registrado = ''
+
+        while True:
+            # Tratamento para quando o cliente desconectar
             try:
-                pedidos.enfileira(msgDecodificada[1])
-            finally:
-                # Libera o bloqueio após a inserção na fila
-                lock.release()
-            msg = f'{cmd_server[1]}/\n'
-            msg += f'20O - Compra realizada com sucesso.\n{msgDecodificada[1]}'
-            con.send(str.encode(msg))
+                msg_client = client_socket.recv(self.__max_message_size).decode()
+            except ConnectionResetError:
+                print("Cliente", client_socket.getpeername(), "desconectou!")
+                break
 
-        elif msgDecodificada[0] == 'QUIT':
-            msg = f'{cmd_server[2]}/\n'
-            msg += '204 - Desconecção efetuada com sucesso.'
-            con.send(str.encode(msg))
+            if msg_client.startswith("GET_BOOKS"):
+                cpf_registrado = self.registrar_cliente(client_socket, msg_client)
 
-    print("Desconectando do cliente", cliente)
-    con.close()
+            # Compra da rifa, é adicionada na tabela o numero da rifa e cpf do comprador
+            if msg_client.startswith("COMPRAR"):
+                self.comprar_rifa(client_socket, cpf_registrado, msg_client)
 
-def limpaTerminal():
-    if platform.system() == 'Windows':
-        os.system('cls')
-    else:
-        os.system('clear')
+            # Lista os números disponíveis para compra
+            elif msg_client == "DISPONIVEIS":
+                self.verificar_disponiveis(client_socket)
 
-   
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-servidor = (HOST, PORTA)
-sock.bind(servidor)
-sock.listen(50)
+            # Mostra os números comprados pelo cliente
+            elif msg_client == "COMPRADOS":
+                with self.__lock_rifas:
+                    client_socket.send(f"208-{self.__clientes.buscar(cpf_registrado)}".encode())
 
-escolha = MenuLivros()
+            # Desconecta o cliente
+            elif msg_client == "SAIR":
+                self.desconectar_cliente(client_socket)
+                break
 
-if escolha == '1':
-    con, cliente = sock.accept()
-    t = threading.Thread(target=processarCliente, args=(con, cliente,))
-    t.start()
-    escolha = 0
-    while escolha != '3':
-        if escolha == '1':
-            print('\nA livraria já está funcionando!')
-            input()
-            pass
-        elif escolha == '2':
-            if(pedidos.estaVazia()):
-                print("A fila de pedidos está vazia!")
-                input()
+            # Verifica se os números disponiveis já esgotaram
+            elif msg_client == "ESGOTOU":
+                self.validar_esgotou(client_socket)
+
+            # Realiza o sorteio, caso não existam mais números disponiveis
+            elif msg_client == "SORTEIO":
+                self.sortear(client_socket)
+
+        client_socket.close()
+
+    def registrar_cliente(self, client_socket, msg_client):
+        with self.__lock_clientes:
+            _, cpf = msg_client.split()
+            cliente = self.__clientes.buscar(cpf)
+            if cliente is None:
+                self.__clientes.inserir(cpf, [])
+                resposta = "200"
+                client_socket.send(resposta.encode())
+                return cpf
             else:
-                lock.acquire()
-                try:
-                    print(pedidos)
-                    view = ''
-                    tam = pedidos.__len__()
-                    i = 0
-                    while i < tam:
-                        view += f'{1} - {pedidos}'
-                        print(view)
-                finally:       
-                        input()
-                    
+                resposta = "201"
+                client_socket.send(resposta.encode())
+                return cpf
 
-        escolha = MenuLivros()
+    def comprar_rifa(self, client_socket, cpf_registrado, msg_client):
+        with self.__lock_rifas:
+            _, numero = msg_client.split()
+            if int(numero) < 0 or int(numero) >= self.__gerenciador.get_tamanho():
+                resposta = "400"
+            else:
+                numero_comprado = self.__gerenciador.comprar(int(numero), cpf_registrado)
+                if numero_comprado > -1:
+                    numeros_comprados_por_cliente = self.__clientes.buscar(cpf_registrado)
+                    numeros_comprados_por_cliente.append(numero_comprado)
+                    self.__clientes.set_valor(cpf_registrado, numeros_comprados_por_cliente)
+                    resposta = f"202"
+                else:
+                    resposta = f"401"
+            client_socket.send(resposta.encode())
 
-print("Encerrando servidor...")
-sock.close()
+    def verificar_disponiveis(self, client_socket):
+        with self.__lock_rifas:
+            numeros = self.__gerenciador.numeros_nao_comprados()
+            resposta = f"203-" + ", ".join(map(str, numeros))
+            client_socket.send(resposta.encode())
+
+    def desconectar_cliente(self, client_socket):
+        print("Cliente", client_socket.getpeername(), "desconectou!")
+        enviar = "204"
+        client_socket.send(enviar.encode())
+
+    def validar_esgotou(self, client_socket):
+        with self.__lock_rifas:
+            if self.__gerenciador.esgotou():
+                enviar = "205"
+                client_socket.send(enviar.encode())
+            else:
+                enviar = "206"
+                client_socket.send(enviar.encode())
+
+    def sortear(self, client_socket):
+        if self.__gerenciador.esgotou():
+            mensagem = self.__gerenciador.sorteio()
+            client_socket.send(f"207-{mensagem}".encode())
+        else:
+            enviar = "402"
+            client_socket.send(enviar.encode())
