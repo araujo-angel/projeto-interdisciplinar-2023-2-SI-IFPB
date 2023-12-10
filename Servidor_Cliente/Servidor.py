@@ -98,37 +98,6 @@ class Server:
                 resposta = "400"
                 client_socket.send(resposta.encode())
                 return cpf
-        
-
-    def registrar_cliente(self, client_socket, msg_client):
-        with self.__lock_clientes:
-            _, cpf = msg_client.split()
-            cliente = self.__clientes.buscar(cpf)
-            if cliente is None:
-                self.__clientes.inserir(cpf, [])
-                resposta = "200"
-                client_socket.send(resposta.encode())
-                return cpf
-            else:
-                resposta = "201"
-                client_socket.send(resposta.encode())
-                return cpf
-
-    def comprar_rifa(self, client_socket, cpf_registrado, msg_client):
-        with self.__lock_rifas:
-            _, numero = msg_client.split()
-            if int(numero) < 0 or int(numero) >= self.__gerenciador.get_tamanho():
-                resposta = "400"
-            else:
-                numero_comprado = self.__gerenciador.comprar(int(numero), cpf_registrado)
-                if numero_comprado > -1:
-                    numeros_comprados_por_cliente = self.__clientes.buscar(cpf_registrado)
-                    numeros_comprados_por_cliente.append(numero_comprado)
-                    self.__clientes.set_valor(cpf_registrado, numeros_comprados_por_cliente)
-                    resposta = f"202"
-                else:
-                    resposta = f"401"
-            client_socket.send(resposta.encode())
 
     def comprarLivro(self, client_socket, cpfCliente, msg_client):
         with self.__lock_livros:

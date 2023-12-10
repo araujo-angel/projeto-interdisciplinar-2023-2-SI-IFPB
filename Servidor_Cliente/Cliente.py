@@ -70,11 +70,23 @@ def main():
                 cls()
                 _, resposta = enviar_mensagem("GET_BOOKS").split("-", 1)
                 print(f'Livros disponíveis:\n{resposta}')
-                compra = pedido.comprarLivro(enviar_mensagem)
+                isbn = pedido.inputISBN()
+                qtd = pedido.inputQtd()
+
+                resposta = enviar_mensagem(f"COMPRAR {isbn} {qtd}").split('-')
+                codigo = resposta[0]
+                if codigo == '201':
+                    titulo = resposta[1]
+                    preco = resposta[2]
+                    print(CODIGOS_SERVIDOR[codigo])
+                    estoque_disponivel = int(enviar_mensagem(f"QTLIVRO {isbn}"))
+                    compra = pedido.comprarLivro(isbn, titulo, preco, qtd, estoque_disponivel)
+                else:
+                    print(CODIGOS_SERVIDOR[codigo])
 
             elif choice == '2':
                 cls()
-                menuCarrinho(enviar_mensagem, lista)
+                pedido.menuCarrinho(enviar_mensagem, lista)
 
             elif choice == '3':
                 cls()
