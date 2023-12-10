@@ -9,7 +9,7 @@ GET_BOOKS <livro> - Solicita ao servidor o catálogo de livros.
 Parâmetros: Número com a quantidade de livros.
 Resposta do Servidor: 201 - Pode realizar a compra. 
 
-BUY_SUCESS <numero> - Solicita ao servidor a compra de um ou mais livros.
+BUY_SUCCESS <numero> - Solicita ao servidor a compra de um ou mais livros.
 Parâmetros:
 Resposta do Servidor: 
 200 - Cliente encontrado com sucesso!

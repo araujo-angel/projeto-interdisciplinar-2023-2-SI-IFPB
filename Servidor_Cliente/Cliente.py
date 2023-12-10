@@ -1,6 +1,9 @@
 import socket
 import os
 import sys
+import signal
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from Pedido import *
 
 MAX_MESSAGE_SIZE = 1024
 HOST = 'localhost'
@@ -17,8 +20,13 @@ CODIGOS_SERVIDOR = {
     '201': 'Pedido registrado com sucesso!',
     '204': 'Desconexão efetuada com sucesso!',
     '400': 'Cliente não encontrado.',
-    '401': 'Este livro não está disponível no estoque.',
+    '401': 'Quantidade não disponível no estoque.',
+    '405': 'Número inválido.',
+    '406': 'ISBN inexistente'
 }
+
+#PEDIDO
+pedido = Pedido()
 
 
 def cls():
@@ -35,91 +43,74 @@ def main():
     mensagem_servidor = client_socket.recv(MAX_MESSAGE_SIZE).decode()
     print(mensagem_servidor)
 
+    
+
     def enviar_mensagem(mensagem):
         client_socket.send(mensagem.encode())
         return client_socket.recv(MAX_MESSAGE_SIZE).decode()
+    
+    def ctrl_c_handler(signum, frame):
+        print("\nEncerrando o programa.")
+        client_socket.send("QUIT".encode())
+        sys.exit(0)
 
-    resposta = enviar_mensagem(f"VALIDAR {input_cpf()}")
+    signal.signal(signal.SIGINT, ctrl_c_handler)
+
+    resposta = enviar_mensagem(f"VALIDAR {inputCPF()}")
     print(CODIGOS_SERVIDOR[resposta])
+    while CODIGOS_SERVIDOR[resposta] != 'Cliente encontrado com sucesso!':
+        resposta = enviar_mensagem(f"VALIDAR {inputCPF()}")
+        print(CODIGOS_SERVIDOR[resposta])
 
-    while True:
-        choice = mostrar_menu()
+    if CODIGOS_SERVIDOR[resposta] == 'Cliente encontrado com sucesso!':
+        while True:
+            choice = mostrarMenu()
 
-        if choice == '1':
-            cls()
-            comprarLivro(enviar_mensagem)
+            if choice == '1':
+                cls()
+                _, resposta = enviar_mensagem("GET_BOOKS").split("-", 1)
+                print(f'Livros disponíveis:\n{resposta}')
+                compra = pedido.comprarLivro(enviar_mensagem)
 
-        elif choice == '2':
-            cls()
-            _, resposta = enviar_mensagem("DISPONIVEIS").split("-", 1)
-            print(f'Livros disponíveis: {resposta}')
+            elif choice == '2':
+                cls()
+                menuCarrinho(enviar_mensagem, lista)
 
-        elif choice == '3':
-            cls()
-            codigo, resposta = enviar_mensagem(f"COMPRADOS").split("-", 1)
-            print(CODIGOS_SERVIDOR[codigo])
-            print(resposta)
+            elif choice == '3':
+                cls()
+                resposta = enviar_mensagem(f"FINALIZAR")
+                if resposta == "201":
+                    print(CODIGOS_SERVIDOR['201'])
+                else:
+                    _, ganhador = resposta.split("-", 1)
+                    numero_sorteado, cpfComprador = comprador.split("-", 1)
+                    print(f'\nSORTEIO!\n\nNumero sorteado: {numero_sorteado}\nCPF do ganhador: {cpf_ganhador}\n')
 
-        elif choice == '3':
-            cls()
-            resposta = enviar_mensagem(f"FINALIZAR")
-            if resposta == "201":
-                print(CODIGOS_SERVIDOR['201'])
+            elif choice == '4':
+                resposta = enviar_mensagem("QUIT")
+                if resposta == "204":
+                    print('Volte sempre!')
+                    break
+
             else:
-                _, ganhador = resposta.split("-", 1)
-                numero_sorteado, cpfComprador = comprador.split("-", 1)
-                print(f'\nSORTEIO!\n\nNumero sorteado: {numero_sorteado}\nCPF do ganhador: {cpf_ganhador}\n')
+                cls()
+                print("Opção inválida! Tente novamente.")
 
-        elif choice == '4':
-            resposta = enviar_mensagem("QUIT")
-            if resposta == "204":
-                break
-
-        else:
-            cls()
-            print("Opção inválida! Tente novamente.")
-
-    client_socket.close()
+        client_socket.close()
 
 
-def comprarLivro(enviar_mensagem):
-    codigo, resposta = enviar_mensagem("VALIDAR").split("-", 1)
-    if codigo == "200":
-        print("Catálogo\n" + resposta)
-    isbn = inputISBN()
-    if isbn != '':
-        codigo = enviar_mensagem(f"COMPRAR {isbn}")
-        print(CODIGOS_SERVIDOR[codigo])
-    else:
-        print('Número inválido')
 
 
-def inputISBN():
-    while True:
-        isbn = input("Digite o ISBN do livro desejado: ")
-        if isbn.isdigit():
-            cls()
-            return isbn
-        else:
-            print("Entrada inválida. Digite apenas números.")
 
-
-def inputQtd():
-    while True:
-        qtdLivros = input("Digite a quantidade desejada: ")
-        if qtdLivros.isdigit():
-            cls()
-            return qtdLivros
-        else:
-            print("Entrada inválida. Digite apenas números.")
 
 
 def inputCPF():
-    cpf = input("Digite o CPF: ")
+    print('Para desfrutar de nossos serviços, é preciso estar cadastrado.')
+    cpf = input("Digite o CPF ou ctrl+c para sair: ")
     while not validaCPF(cpf):
         cls()
         print("CPF inválido! Tente novamente.")
-        cpf = input("Digite o CPF: ")
+        cpf = input("Digite o CPF ou ctrl+c para sair: ")
     return cpf
 
 
@@ -130,7 +121,7 @@ def validaCPF(_cpf):
         return False
     
 
-def mostrar_menu():
+def mostrarMenu():
     print('''
         ***MENU***
         1 - Exibir catálogo de livros
@@ -140,3 +131,7 @@ def mostrar_menu():
     ''')
     choice = input("Digite a opção desejada: ")
     return choice
+
+
+if __name__ == '__main__':
+    main()

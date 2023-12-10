@@ -37,4 +37,4 @@ class Livros:
         self.__preco = novoPreco
 
     def __str__(self):
-        return f"{self.__titulo} (ISBN: {self.__isbn}, Autor: {self.__autor}, Preço: {self.__preco}, Quantidade: {self.__qtdDeLivros})"
+        return f"{self.__titulo} (ISBN: {self.__isbn}, Autor: {self.__autor}, Quantidade: {self.__qtdDeLivros}, Preço: {self.__preco})"
