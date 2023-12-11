@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from Livros.EstoqueDeLivros import *
-from DataStructure.ListaEncadeadaOrdenada import *
+from DataStructure.ListaEncadeada import *
 from Comprador.CompradoresCadastrados import *
 from Pedido import *
 
@@ -67,15 +67,13 @@ class Server:
                 self.exibirCatalogo(client_socket)
 
             if msg_client.startswith("COMPRAR"):
-                 self.comprarLivro(client_socket, cpfCliente, msg_client)
+                self.comprarLivro(client_socket, cpfCliente, msg_client)
 
             if msg_client.startswith("QTLIVRO"):
-                 self.quantidadeLivro(client_socket, cpfCliente, msg_client)
+                self.quantidadeLivro(client_socket, cpfCliente, msg_client)
 
-            # Mostra os números comprados pelo cliente
-            # elif msg_client == "COMPRADOS":
-            #     with self.__lock_rifas:
-            #         client_socket.send(f"208-{self.__clientes.buscar(cpf_registrado)}".encode())
+            if msg_client.startswith("FINALIZAR"):
+                self.finalizarPedido(cpfCliente, client_socket, msg_client)
 
             # Desconecta o cliente
             elif msg_client == "QUIT":
@@ -115,7 +113,6 @@ class Server:
             if self.__estoque.verificarLivroCadastrado(isbn):
                 if self.__estoque.verificarDisponibilidade(isbn, quantidade):
                     # Criar um pedido para o cliente
-                    #novo_pedido = Pedido(cpfCliente, isbn, quantidade)
                     livro = self.__estoque.obterLivro(isbn)
                     titulo = livro.getTitulo()
                     preco = livro.getPreco()
@@ -156,55 +153,34 @@ class Server:
 
             client_socket.send(resposta.encode())
 
-    def comprarLivro2(self, client_socket, cpfCliente, msg_client):
-        with self.__lock_livros:
-            _, isbn = msg_client.split()
-            if int(numero) < 0 or int(numero) >= self.__gerenciador.get_tamanho():
-                resposta = "400"
-            else:
-                numero_comprado = self.__gerenciador.comprar(int(numero), cpf_registrado)
-                if numero_comprado > -1:
-                    numeros_comprados_por_cliente = self.__clientes.buscar(cpf_registrado)
-                    numeros_comprados_por_cliente.append(numero_comprado)
-                    self.__clientes.set_valor(cpf_registrado, numeros_comprados_por_cliente)
-                    resposta = f"202"
-                else:
-                    resposta = f"401"
-            client_socket.send(resposta.encode())
-
-    def verificar_disponiveis(self, client_socket):
-        with self.__lock_compradores:
-            livros = self.__gerenciador.numeros_nao_comprados()
-            resposta = f"203-" + ", ".join(map(str, numeros))
-            client_socket.send(resposta.encode())
-
     def exibirCatalogo(self, client_socket):
         with self.__lock_livros:
             catalogo = self.__estoque.catalogo()
             resposta = f"203-" + "\n".join(catalogo)
             client_socket.send(resposta.encode())
 
+
+    def finalizarPedido(self, cpfCliente, client_socket, msg_client):
+        if ' ' in msg_client:  # Verifica se há um espaço na mensagem
+            _, listaDePedidos = msg_client.split(' ', 1)  # Faz a divisão em duas partes no primeiro espaço encontrado
+            self.__pedidos.append(listaDePedidos)
+            print("Cliente do CPF: ", cpfCliente, "finalizou sua compra!")
+            enviar = "205-"
+            client_socket.send(enviar.encode())
+        else:
+            # Caso a mensagem não esteja no formato esperado
+            print("Formato de mensagem inválido para finalizar pedido:", msg_client)
+   
+
+
+
+        
+
     def desconectar_cliente(self, client_socket):
         print("Cliente", client_socket.getpeername(), "desconectou!")
         enviar = "204"
         client_socket.send(enviar.encode())
 
-    def validar_esgotou(self, client_socket):
-        with self.__lock_rifas:
-            if self.__gerenciador.esgotou():
-                enviar = "205"
-                client_socket.send(enviar.encode())
-            else:
-                enviar = "206"
-                client_socket.send(enviar.encode())
-
-    def sortear(self, client_socket):
-        if self.__gerenciador.esgotou():
-            mensagem = self.__gerenciador.sorteio()
-            client_socket.send(f"207-{mensagem}".encode())
-        else:
-            enviar = "402"
-            client_socket.send(enviar.encode())
 
     def prepararEstoque(self):
         self.__estoque.cadastrarLivroDoArquivo('Livros\Livros.txt')

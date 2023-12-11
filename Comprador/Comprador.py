@@ -16,8 +16,6 @@ class Comprador:
         self.__nome = nome
         self.__telefone = telefone
         self.__cep = cep
-        self.__pagamento = None
-        self.__troco = None
 
     def getCpf(self):
         return self.__cpf
@@ -31,12 +29,6 @@ class Comprador:
     def getCep(self):
         return self.__pagamento
 
-    def getPagamento(self):
-        return self.__pagamento
-
-    def getTroco(self):
-        return self.__troco
-
     def setCpf(self, novoCpf):
         self.__cpf = novoCpf
 
@@ -49,14 +41,6 @@ class Comprador:
     def setCep(self, novoCep):
         self.__cep = novoCep
 
-    def setPagamento(self, formaPagamento):
-        if formaPagamento == '1':
-            self.__pagamento = 'Cartão'
-        elif formaPagamento == '2':
-            self.__pagamento = 'Dinheiro'
-
-    def setTroco(self, troco):
-        self.__troco = troco
 
     def __str__(self):
-        return f'CPF: {self.__cpf} | Nome: {self.__nome} | Telefone: {self.__telefone} | CEP: {self.__cep} | {self.__pagamento} | Troco: {self.__troco}'
+        return f'CPF: {self.__cpf} | Nome: {self.__nome} | Telefone: {self.__telefone} | CEP: {self.__cep}'
