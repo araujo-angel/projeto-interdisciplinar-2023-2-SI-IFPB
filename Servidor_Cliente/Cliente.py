@@ -91,8 +91,8 @@ def main():
 
 
             elif choice == '3':
-                resposta = enviar_mensagem("FINALIZAR")
-                codigo = resposta.split('-')[0]  
+                resposta = enviar_mensagem(f"FINALIZAR {pedido.getLista()}").split('-')
+                codigo = resposta[0]  
                 if codigo == '205':
                     print(f'\nCompra finalizada com sucesso!\n\nPedido feito: R${pedido.calcularPrecoTotal()}')
                     resposta = enviar_mensagem("QUIT")

@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from Livros.EstoqueDeLivros import *
-from DataStructure.ListaEncadeadaOrdenada import *
+from DataStructure.ListaEncadeada import *
 from Comprador.CompradoresCadastrados import *
 from Pedido import *
 
@@ -73,7 +73,7 @@ class Server:
                 self.quantidadeLivro(client_socket, cpfCliente, msg_client)
 
             if msg_client.startswith("FINALIZAR"):
-                self.finalizarPedido(client_socket)
+                self.finalizarPedido(cpfCliente, client_socket, msg_client)
 
             # Desconecta o cliente
             elif msg_client == "QUIT":
@@ -159,10 +159,22 @@ class Server:
             resposta = f"203-" + "\n".join(catalogo)
             client_socket.send(resposta.encode())
 
-    def finalizarPedido(self, cpfCliente, client_socket):
-        print("Cliente do CPF: ", cpfCliente, "finalizou sua compra!")
-        enviar = "205"
-        client_socket.send(enviar.encode())
+
+    def finalizarPedido(self, cpfCliente, client_socket, msg_client):
+        if ' ' in msg_client:  # Verifica se há um espaço na mensagem
+            _, listaDePedidos = msg_client.split(' ', 1)  # Faz a divisão em duas partes no primeiro espaço encontrado
+            self.__pedidos.append(listaDePedidos)
+            print("Cliente do CPF: ", cpfCliente, "finalizou sua compra!")
+            enviar = "205-"
+            client_socket.send(enviar.encode())
+        else:
+            # Caso a mensagem não esteja no formato esperado
+            print("Formato de mensagem inválido para finalizar pedido:", msg_client)
+   
+
+
+
+        
 
     def desconectar_cliente(self, client_socket):
         print("Cliente", client_socket.getpeername(), "desconectou!")
