@@ -164,16 +164,13 @@ class Server:
         if ' ' in msg_client:  # Verifica se há um espaço na mensagem
             _, listaDePedidos = msg_client.split(' ', 1)  # Faz a divisão em duas partes no primeiro espaço encontrado
             self.__pedidos.append(listaDePedidos)
+            print(self.__pedidos)
             print("Cliente do CPF: ", cpfCliente, "finalizou sua compra!")
             enviar = "205-"
             client_socket.send(enviar.encode())
         else:
             # Caso a mensagem não esteja no formato esperado
             print("Formato de mensagem inválido para finalizar pedido:", msg_client)
-   
-
-
-
         
 
     def desconectar_cliente(self, client_socket):
