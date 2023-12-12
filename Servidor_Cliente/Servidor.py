@@ -117,8 +117,10 @@ class Server:
                     titulo = livro.getTitulo()
                     preco = livro.getPreco()
                     resposta = f"201-{titulo}-{preco}"  # Código para pedido criado com sucesso
+                    print(f"Quantidade desejada de '{livro.getTitulo()}' disponível no estoque.")
                 else:
                     resposta = "401"  # Código para quantidade insuficiente em estoque
+                    print(f"Erro: Não há quantidade suficiente de '{livro.getTitulo()}' no estoque.")
             else:
                 print(f'Cliente do CPF {cpfCliente} digitou um ISBN inválido: {isbn}')
                 resposta = "406"  # Código para ISBN inválido
