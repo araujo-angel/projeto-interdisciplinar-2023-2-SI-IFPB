@@ -2,6 +2,11 @@ import socket
 import os
 import sys
 import signal
+from time import sleep
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from Pedido import *
+import ast
+import datetime
 
 MAX_MESSAGE_SIZE = 1024
 HOST = 'localhost'
@@ -15,13 +20,25 @@ elif len(sys.argv) == 3:
 
 CODIGOS_SERVIDOR = {
     '200': 'Cliente encontrado com sucesso!',
-    '201': 'Pedido registrado com sucesso!',
+    '201': 'Pedido adicionado ao carrinho com sucesso!',
+    '203': 'Catálogo enviado.',
     '204': 'Desconexão efetuada com sucesso!',
+    '205': 'Pedido registrado com sucesso!',
+    '206': 'Compra finalizada com sucesso!',
+    '207': 'Compra cancelada.',
+    '211': 'Confira seu pedido.',
+    '233': 'Quantidade alterada com sucesso!',
     '400': 'Cliente não encontrado.',
     '401': 'Quantidade não disponível no estoque.',
     '405': 'Número inválido.',
-    '406': 'ISBN inexistente'
+    '406': 'ISBN inexistente',
+    '440': 'Seu carrinho está vazio.',
+    '444': 'Livros esgotados.',
+    '480': 'Quantidade inválida para a alteração.'
 }
+
+#PEDIDO
+pedido = Pedido()
 
 
 def cls():
@@ -37,6 +54,8 @@ def main():
 
     mensagem_servidor = client_socket.recv(MAX_MESSAGE_SIZE).decode()
     print(mensagem_servidor)
+
+    
 
     def enviar_mensagem(mensagem):
         client_socket.send(mensagem.encode())
@@ -57,72 +76,89 @@ def main():
 
     if CODIGOS_SERVIDOR[resposta] == 'Cliente encontrado com sucesso!':
         while True:
-            choice = mostrar_menu()
+            choice = mostrarMenu()
 
             if choice == '1':
                 cls()
                 _, resposta = enviar_mensagem("GET_BOOKS").split("-", 1)
                 print(f'Livros disponíveis:\n{resposta}')
-                comprarLivro(enviar_mensagem)
+                isbn = pedido.inputISBN()
+                qtd = pedido.inputQtd()
+
+                resposta = enviar_mensagem(f"COMPRAR {isbn} {qtd}").split('-')
+                codigo = resposta[0]
+                if codigo == '201':
+                    titulo = resposta[1]
+                    preco = resposta[2]
+                    print(CODIGOS_SERVIDOR[codigo])
+                    estoque_disponivel = int(enviar_mensagem(f"QTLIVRO {isbn}"))
+                    compra = pedido.comprarLivro(isbn, titulo, preco, qtd, estoque_disponivel)
+                else:
+                    print(CODIGOS_SERVIDOR[codigo])
+                    
 
             elif choice == '2':
                 cls()
-                codigo, resposta = enviar_mensagem(f"COMPRADOS").split("-", 1)
-                print(CODIGOS_SERVIDOR[codigo])
-                print(resposta)
+                menuCarrinho(enviar_mensagem)
+
 
             elif choice == '3':
-                cls()
-                resposta = enviar_mensagem(f"FINALIZAR")
-                if resposta == "201":
-                    print(CODIGOS_SERVIDOR['201'])
-                else:
-                    _, ganhador = resposta.split("-", 1)
-                    numero_sorteado, cpfComprador = comprador.split("-", 1)
-                    print(f'\nSORTEIO!\n\nNumero sorteado: {numero_sorteado}\nCPF do ganhador: {cpf_ganhador}\n')
+                resposta = enviar_mensagem(f"FINALIZAR-{pedido.quantidadeISBNsDiferentes()}-{str(pedido.getLista())}").split('-')
+                
+                codigo = resposta[0]
+                
+                # Analisar resposta do servidor após finalizar pedido
+                if codigo == "440" or codigo =="444":
+                    # Carrinho vazio ou livros esgotados
+                    print(CODIGOS_SERVIDOR[codigo])
+                    sleep(2)
+                    continue
+                elif codigo == "211":
+                    print(CODIGOS_SERVIDOR[codigo])
+                    #_, livros_disponiveis = resposta.split('-', 1)
+                    # livros_disponiveis_str = resposta[1]
+                    # livros_disponiveis = ast.literal_eval(livros_disponiveis_str)
+                    livros_disponiveis = resposta[1]
+                    
+                    # Pelo menos um livro está disponível
+                    print("Livros disponíveis do seu carrinho:")
+                    print(livros_disponiveis)
+
+                    # Oferecer escolha ao cliente
+                    escolha = input("Deseja confirmar a compra? (s/n): ").lower()
+                    
+                    while escolha != 's' and escolha != 'n':
+                        print('Opção inválida.')
+                        escolha = input("Deseja confirmar a compra? (s/n): ").lower()
+                    resposta_confirmar = enviar_mensagem(escolha)
+                    if resposta_confirmar == "206":
+                        #Compra finalizada com sucesso!
+                        print(CODIGOS_SERVIDOR[resposta_confirmar])
+                        total = client_socket.recv(MAX_MESSAGE_SIZE).decode()
+                        print(f"Total: R${total}")
+                        resposta = enviar_mensagem("QUIT")
+                        if resposta == "204":
+                            print('Volte sempre!')
+                            break
+                    elif resposta_confirmar == "207":
+                        #Compra cancelada.
+                        print(CODIGOS_SERVIDOR[resposta_confirmar])
+                        sleep(2)
+                        continue
+
+
 
             elif choice == '4':
+                cls()
                 resposta = enviar_mensagem("QUIT")
                 if resposta == "204":
                     print('Volte sempre!')
                     break
-
+        
             else:
-                cls()
                 print("Opção inválida! Tente novamente.")
 
         client_socket.close()
-
-
-def comprarLivro(enviar_mensagem):
-    isbn = inputISBN()
-    quantidade = inputQtd()
-    resposta = enviar_mensagem(f"COMPRAR {isbn} {quantidade}")
-    # codigo, resposta = enviar_mensagem("VALIDAR").split("-", 1)
-    if isbn != '':
-        print(CODIGOS_SERVIDOR[resposta])
-    else:
-        print(CODIGOS_SERVIDOR[resposta])
-
-
-def inputISBN():
-    while True:
-        isbn = input("Digite o ISBN do livro desejado: ")
-        if isbn.isdigit():
-            cls()
-            return isbn
-        else:
-            print("Entrada inválida. Digite apenas números.")
-
-
-def inputQtd():
-    while True:
-        qtdLivros = input("Digite a quantidade desejada: ")
-        if qtdLivros.isdigit():
-            cls()
-            return qtdLivros
-        else:
-            print("Entrada inválida. Digite apenas números.")
 
 
 def inputCPF():
@@ -142,16 +178,91 @@ def validaCPF(_cpf):
         return False
     
 
-def mostrar_menu():
+def mostrarMenu():
     print('''
         ***MENU***
-        1 - Exibir catálogo de livros
+        1 - Comprar livros
         2 - Abrir carrinho
         3 - Finalizar pedido
         4 - Encerrar
     ''')
     choice = input("Digite a opção desejada: ")
     return choice
+
+def menuCarrinho(enviar_mensagem):
+        print('*****Carrinho*****')
+        if pedido.getLista().estaVazia():
+            print("Seu carrinho está vazio! Adicione um livro!")
+            print("\n1 - Adicionar livro")
+            print("\n2 - Voltar")
+        else:
+            for i, pedidoLocal in enumerate(pedido.getLista(), start=1):
+                isbn = pedidoLocal[0]
+                titulo = pedidoLocal[1]
+                preco = pedidoLocal[2]
+                quantidade = pedidoLocal[3]
+                            
+                print(f"{i}. 'ISBN': '{isbn}', 'Título': '{titulo}', 'Preço': '{preco}', 'Quantidade': '{quantidade}'")
+
+            print(f'Total: R${pedido.calcularPrecoTotal()}')
+            print("\n1 - Remover livro")
+            print("\n2 - Alterar quantidade")
+            print("\n3 - Voltar")
+        
+        escolha = input("\nEscolha uma opção: ").lower()
+        if escolha == '1' and not pedido.getLista().estaVazia():
+            isbn = pedido.inputISBN()
+            pedido.removerLivroPorIsbnFor(isbn)
+            menuCarrinho(enviar_mensagem)
+
+        elif (escolha == '1' and pedido.getLista().estaVazia()):
+            cls()
+            _, resposta = enviar_mensagem("GET_BOOKS").split("-", 1)
+            print(f'Livros disponíveis:\n{resposta}')
+            isbn = pedido.inputISBN()
+            qtd = pedido.inputQtd()
+
+            resposta = enviar_mensagem(f"COMPRAR {isbn} {qtd}").split('-')
+            codigo = resposta[0]
+            if codigo == '201':
+                titulo = resposta[1]
+                preco = resposta[2]
+                print(CODIGOS_SERVIDOR[codigo])
+                estoque_disponivel = int(enviar_mensagem(f"QTLIVRO {isbn}"))
+                compra = pedido.comprarLivro(isbn, titulo, preco, qtd, estoque_disponivel)
+            else:
+                print(CODIGOS_SERVIDOR[codigo])
+
+        elif (escolha == '2' and not pedido.getLista().estaVazia()):
+            isbn = pedido.inputISBN()
+            qtd = pedido.inputQtd()
+
+            estoque_disponivel = int(enviar_mensagem(f"QTLIVRO {isbn}"))
+            if int(qtd) > estoque_disponivel:
+                #quantidade não disponível no estoque
+                print(CODIGOS_SERVIDOR['401'])
+            else:
+                if pedido.alterarQuantidadeDoPedido(isbn, qtd):
+                    print('Quantidade alterada com sucesso')
+                else:
+                    print('Este livro não está no seu carrinho')
+
+
+            # resposta = enviar_mensagem(f"ALTERAR-{quantidade}-{isbn}").split('-')
+            # print(resposta)
+            # if resposta[0] == '233':
+            #     print(CODIGOS_SERVIDOR[resposta[0]])
+            #     titulo = resposta[1]
+            #     preco = resposta[2]
+            #     estoque_disponivel = int(enviar_mensagem(f"QTLIVRO {isbn}"))
+            #     compra = pedido.comprarLivro(isbn, titulo, preco, qtd, estoque_disponivel)
+            # elif resposta[0] == '401' or resposta[0] == '480' or resposta[0] == '406':
+            #     print(CODIGOS_SERVIDOR[resposta[0]])
+        
+
+
+        elif (escolha == '3' and not pedido.getLista().estaVazia()) or (escolha == '2' and pedido.getLista().estaVazia()):
+            return
 
 if __name__ == '__main__':
     main()
