@@ -37,7 +37,7 @@ class Pedido:
     def inputQtd(self):
         while True:
             qtdLivros = input("Digite a quantidade desejada: ")
-            if qtdLivros.isdigit():
+            if qtdLivros.isdigit() and int(qtdLivros)>0:
                 return qtdLivros
             else:
                 print("Entrada inválida. Digite apenas números maiores que zero")  
