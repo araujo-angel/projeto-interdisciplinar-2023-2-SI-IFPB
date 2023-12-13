@@ -97,18 +97,20 @@ def main():
                 resposta = enviar_mensagem(f"FINALIZAR {pedido.getLista()}").split('-')
                 codigo = resposta[0]  
                 if codigo == '205':
-                    pedidoLocal = pedido.getLista()
+                    pedidoLocal = str(pedido.getLista()).split(', ')
                     isbn = pedidoLocal[0]
                     titulo = pedidoLocal[1]
                     preco = pedidoLocal[2]
-                    quantidade = pedidoLocal[3]
+                    quantidade = pedidoLocal[3].split(']')
+                    quantidade = quantidade[0]
 
+                    print("----------------------------------")
                     print(f"Nota Fiscal - Número: {random.randint(1,1000)}")
-                    print(f"Data: {datetime.datetime.now()}")
-                    print("------- Livros -------")
-                    print(f"{i}. {isbn}: {titulo} x R${preco} - {quantidade}")
-                    print("-----------------")
-                    print(f"Total da nota: R${pedido.calcularPrecoTotal()}")
+                    print(f"Data: {datetime.datetime.now()}\n")
+                    print("******* Livros *******")   
+                    print(f"{titulo} - {quantidade}x R${preco}\n")
+                    print(f"Total do pedido: R${pedido.calcularPrecoTotal()}")
+                    print("----------------------------------")
 
                     resposta = enviar_mensagem("QUIT")
                     if resposta == "204":
@@ -171,9 +173,9 @@ def menuCarrinho(enviar_mensagem):
                 preco = pedidoLocal[2]
                 quantidade = pedidoLocal[3]
 
-                print(f"{i}. {isbn}: {titulo} x R${preco} - {quantidade}")
-                print("-----------------")
-            print(f"Total da nota: R${pedido.calcularPrecoTotal()}")
+                print(f"{i}. {isbn}: {titulo} - {quantidade} x R${preco}")
+                print("-------------------------------------------------")
+            print(f"Total do pedido: R${pedido.calcularPrecoTotal()}")
 
             print("\n1 - Remover livro")
             print("\n2 - Alterar quantidade de livros")
