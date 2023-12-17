@@ -232,7 +232,7 @@ class Server:
 
                 # Verificar se o livro está cadastrado e se há quantidade disponível
                 if self.__estoque.verificarLivroCadastrado(isbn) and self.__estoque.verificarDisponibilidade(isbn, quantidade):
-                    livros_disponiveis.append(f"\nISBN: {isbn}, Título: {titulo}, Quantidade: {quantidade}, Preço: R${preco}\n")
+                    livros_disponiveis.append(f"\nISBN: {isbn}, Título: {titulo}, Quantidade: {quantidade}, Preço: R${preco}")
                     livros_disponiveis_decrementar.append([isbn, quantidade])
 
                     total += quantidade*preco
@@ -241,6 +241,7 @@ class Server:
                     livros_indisponiveis.append(isbn)
 
             if livros_disponiveis:
+                livros_disponiveis.append(f"\nTotal: R${total}")
                 # Pelo menos um livro está disponível, perguntar se cliente quer continuar
                 enviar = f"211-{', '.join([str(livro) for livro in livros_disponiveis])}"
                 client_socket.send(str(enviar).encode())
