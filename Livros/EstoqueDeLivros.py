@@ -101,7 +101,7 @@ class EstoqueDeLivros:
         try:
             with open(nome_arquivo, 'w', encoding='utf-8') as arquivo:
                 for isbn, livro in self.__livros.items():
-                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", "{livro.getPreco()}", {livro.getQtdDeLivros()}\n'
+                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", {livro.getQtdDeLivros()}, {livro.getPreco()}\n'
                     arquivo.write(linha)
 
             print(f"Arquivo {nome_arquivo} atualizado com sucesso.")
