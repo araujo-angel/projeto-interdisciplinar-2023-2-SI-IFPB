@@ -1,6 +1,4 @@
-#from DataStructure.ListaSimplesmenteEncadeada import *
 from DataStructure.ListaEncadeada import *
-#from DataStructure.ListaEncadeadaOrdenada import *
 from Livros.EstoqueDeLivros import *
 
 
@@ -18,13 +16,9 @@ class Pedido:
     """
     def __init__(self):
         self.__pedido = Lista()
-        self.__id = 0
 
     def getLista(self):
         return self.__pedido
-
-    def getId(self):
-        return self.__id
 
     def inputISBN(self):
         while True:
@@ -52,7 +46,6 @@ class Pedido:
         except ListaException:
             return False
         
-
     def obterLivroPorISBN(self, isbn):
         if not self.__pedido.estaVazia():
             try:
@@ -67,7 +60,6 @@ class Pedido:
         else:
             return None
             
-        
     def obterQuantidadeDeLivroNoPedido(self, isbn):
         """
         Verifica a 'Quantidade' do livro com o ISBN fornecido
@@ -142,7 +134,6 @@ class Pedido:
                 return True
         return False
     
-
     
     def calcularPrecoTotal(self):   
         total = 0
@@ -151,36 +142,6 @@ class Pedido:
         return total
 
 
-
-    # def menuCarrinho(self):
-    #     print('*****Carrinho*****')
-    #     if self.__pedido.estaVazia():
-    #         print("Seu carrinho está vazio! Adicione um livro!")
-    #         print("\n1 - Adicionar livro")
-    #         print("\n2 - Voltar")
-    #     else:
-    #         for i, pedido in enumerate(self.__pedido, start=1):
-    #             info = pedido[next(iter(pedido))]  
-                
-    #             print(f"{i}. 'ISBN': '{info['ISBN']}', 'Título': '{info['Título']}', 'Preço': '{info['Preço']}', 'Quantidade': '{info['Quantidade']}'")
-
-    #         print(f'Total: {self.calcularPrecoTotal(self.__pedido)}')
-    #         print("\n1 - Remover livro")
-    #         print("\n2 - Adicionar livro")
-    #         print("\n3 - Voltar")
-        
-    #     escolha = input("\nEscolha uma opção: ").lower()
-    #     if escolha == '1' and len(self.__pedido) != 0:
-    #         isbn = self.inputISBN()
-    #         self.removerLivroPorISBN(self.__pedido, isbn)
-    #         self.menuCarrinho(enviar_mensagem, self.__pedido)
-    #     elif (escolha == '2' and len(self.__pedido) != 0) or (escolha == '1' and len(self.__pedido) == 0):
-    #         _, resposta = enviar_mensagem("GET_BOOKS").split("-", 1)
-    #         print(f'Livros disponíveis:\n{resposta}')
-    #         compra = self.comprarLivro(enviar_mensagem, self.__pedido)
-    #     elif (escolha == '3' and len(self.__pedido) != 0) or (escolha == '2' and len(self.__pedido) == 0):
-    #         return
-
     def __str__(self) -> str:
-        return f'Pedido {self.__id}: {self.__pedido}'
+        return f'Pedidos: {self.__pedido}'
     

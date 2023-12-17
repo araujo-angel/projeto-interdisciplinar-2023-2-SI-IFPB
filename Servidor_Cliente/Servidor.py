@@ -10,7 +10,6 @@ from Pedido import *
 import ast
 #import signal
 
-
 class Server:
     '''
     Classe responsável por gerenciar as conexões dos clientes
@@ -39,7 +38,7 @@ class Server:
         try:
             self.accept_connections()
         except KeyboardInterrupt:
-            self.__server_socket.close() # Fecha socket do servidor quando clicar CTRL C
+            self.__server_socket.close()
 
     # Trata as conexões dos clientes
     def accept_connections(self):
@@ -66,7 +65,7 @@ class Server:
             if msg_client.startswith("VALIDAR"):
                 cpfCliente = self.validarCliente(client_socket, msg_client)
 
-            if msg_client.startswith("GET_BOOKS"):
+            if msg_client.startswith("CATALOGO"):
                 self.exibirCatalogo(client_socket)
 
             if msg_client.startswith("COMPRAR"):
@@ -75,14 +74,11 @@ class Server:
             if msg_client.startswith("QTLIVRO"):
                 self.quantidadeLivro(client_socket, cpfCliente, msg_client)
 
-            if msg_client.startswith("ALTERAR"):
-                self.alterarQuantidadeDoPedido(cpfCliente, client_socket, msg_client)
-
             if msg_client.startswith("FINALIZAR"):
                 self.finalizarPedido(cpfCliente, client_socket, msg_client)
 
             # Desconecta o cliente
-            elif msg_client == "QUIT":
+            elif msg_client == "SAIR":
                 self.desconectar_cliente(client_socket)
                 break
 
@@ -112,25 +108,23 @@ class Server:
                 quantidade = int(quantidade)
             except ValueError:
                 print(f'Cliente do CPF {cpfCliente} tentou comprar {quantidade} livro(s) do ISBN {isbn}')
-                resposta = "405"  # Código para quantidade ou ISBN inválido
+                resposta = "405"  # Dados incorretos, tente novamente.
                 client_socket.send(resposta.encode())
                 return
             
             if self.__estoque.verificarLivroCadastrado(isbn):
                 if self.__estoque.verificarDisponibilidade(isbn, quantidade):
-                    # Criar um pedido para o cliente
                     livro = self.__estoque.obterLivro(isbn)
                     titulo = livro.getTitulo()
                     preco = livro.getPreco()
-                    resposta = f"201-{titulo}-{preco}"  # Código para pedido criado com sucesso
+                    resposta = f"201-{titulo}-{preco}"  # Pedido adicionado ao carrinho com sucesso!
                 else:
-                    resposta = "401"  # Código para quantidade insuficiente em estoque
+                    resposta = "401"  # Quantidade insuficiente em estoque
             else:
                 print(f'Cliente do CPF {cpfCliente} digitou um ISBN inválido: {isbn}')
-                resposta = "406"  # Código para ISBN inválido
+                resposta = "406"  # ISBN inválido
                 client_socket.send(resposta.encode())
                 return
-
 
             client_socket.send(resposta.encode())
 
@@ -142,7 +136,7 @@ class Server:
             try:
                 isbn = int(isbn)
             except ValueError:
-                resposta = "405"  # Código para quantidade ou ISBN inválido
+                resposta = "405"  # Dados incorretos, tente novamente.
                 client_socket.send(resposta.encode())
                 return
             
@@ -152,10 +146,9 @@ class Server:
                 
             else:
                 print(f'Cliente do CPF {cpfCliente} digitou um ISBN inválido: {isbn}')
-                resposta = "406"  # Código para ISBN inválido
+                resposta = "406"  # ISBN inválido
                 client_socket.send(resposta.encode())
                 return
-
 
             client_socket.send(resposta.encode())
 
@@ -165,50 +158,15 @@ class Server:
             resposta = f"203-" + "\n".join(catalogo)
             client_socket.send(resposta.encode())
 
-
-    # def alterarQuantidadeDoPedido(self, cpfCliente, client_socket, msg_client):
-    #     msg = msg_client.split('-')
-    #     quantidade = int(msg[1])
-    #     isbn = int(msg[2])
-    #     print(msg)
-    #     print(isbn)
-    #     print(quantidade)
-
-    #     print(f'Cliente {cpfCliente} quer alterar a quantidade do livro de ISBN {isbn}')
-
-    #     if self.__estoque.verificarLivroCadastrado(isbn):
-    #         if quantidade <= 0:
-    #             resposta = '480-'
-    #         else:
-    #             if self.__estoque.verificarDisponibilidade(isbn, quantidade):
-    #                 # Criar um pedido para o cliente
-    #                 livro = self.__estoque.obterLivro(isbn)
-    #                 titulo = livro.getTitulo()
-    #                 preco = livro.getPreco()
-    #                 resposta = f"233-{titulo}-{preco}"  # Código para pedido criado com sucesso
-    #             else:
-    #                 resposta = "401-"  # Código para quantidade insuficiente em estoque
-    #     else:
-    #         resposta = '406'
-
-
-        # client_socket.send(resposta.encode())
-
-
     def finalizarPedido(self, cpfCliente, client_socket, msg_client):
         with self.__lock_compradores:
-            # _, listaDePedidos = msg_client.split(' ', 1)
             msg = msg_client.split('-')
             listaDePedidos = msg[2]
-
             tamLista = msg[1]
-            #print(tamLista)
             tam = int(tamLista)
-
 
             if listaDePedidos:
                 listaPedidos = ast.literal_eval(listaDePedidos)
-                #print(f'tipo {type(listaPedidos)}')
             else:
                 listaPedidos = ''
             print(listaPedidos)
@@ -243,14 +201,13 @@ class Server:
                         quantidade = int(quantidade)
                         preco = int(preco)
                     except ValueError:
-                        resposta = "405"  # Código para quantidade ou ISBN inválido
+                        resposta = "405"  # Dados incorretos, tente novamente.
                         client_socket.send(resposta.encode())
                         return
                     
-
                     # Verificar se o livro está cadastrado e se há quantidade disponível
                     if self.__estoque.verificarLivroCadastrado(isbn) and self.__estoque.verificarDisponibilidade(isbn, quantidade):
-                        livros_disponiveis.append(f"\nISBN: {isbn}, Título: {titulo}, Quantidade: {quantidade}, Preço: R${preco},")
+                        livros_disponiveis.append(f"\nISBN: {isbn}, Título: {titulo}, Quantidade: {quantidade}, Preço: R${preco}")
                         livros_disponiveis_decrementar.append([isbn, quantidade])
 
                         total += quantidade*preco
@@ -265,11 +222,11 @@ class Server:
                 quantidade = listaPedidos[3]
 
                 try:
-                        isbn = int(isbn)
-                        quantidade = int(quantidade)
-                        preco = int(preco)
+                    isbn = int(isbn)
+                    quantidade = int(quantidade)
+                    preco = int(preco)
                 except ValueError:
-                    resposta = "405"  # Código para quantidade ou ISBN inválido
+                    resposta = "405"  # Dados incorretos, tente novamente.
                     client_socket.send(resposta.encode())
                     return
 
@@ -293,7 +250,7 @@ class Server:
 
                 if escolha == 's':
                     # Cliente confirmou a compra
-                    # Adicionar livros comprados à lista de pedidos
+                    # Adicionar livros comprados à lista de pedidos no servidor
                     self.__pedidos.append(listaDePedidos)
 
                     # Atualizar estoque (elemento[0] é o ISBN e elemento[1] é a quantidade)
@@ -305,33 +262,25 @@ class Server:
                     self.__estoque.atualizarArquivoLivros('Livros\Livros.txt')
 
                     print(f"Cliente do CPF: {cpfCliente} finalizou sua compra!")
-                    enviar = "206"
+                    enviar = "206" # Compra finalizada com sucesso!
                     client_socket.send(enviar.encode())
                     client_socket.send(str(total).encode())
 
                 elif escolha == 'n':
                     # Cliente escolheu cancelar a compra
-                    enviar = "207"
+                    enviar = "207" # Compra cancelada.
                     client_socket.send(enviar.encode())
                     return
             else:
                 # Nenhum livro está disponível, enviar código 444
-                enviar = "444"
+                enviar = "444" # Livros esgotados.
                 client_socket.send(enviar.encode())
-            # Caso a mensagem não esteja no formato esperado
-            #print("Formato de mensagem inválido para finalizar pedido:", msg_client)
  
 
     def desconectar_cliente(self, client_socket):
         print("Cliente", client_socket.getpeername(), "desconectou!")
-        enviar = "204"
+        enviar = "204" # Desconexão efetuada com sucesso!
         client_socket.send(enviar.encode())
-
-    def sinal_interrupcao(self, signum, frame):
-        print("Recebido sinal de interrupção (Ctrl+C). Encerrando o servidor.")
-        self.__server_socket.close()
-        sys.exit(0)
-
 
     def prepararEstoque(self):
         self.__estoque.cadastrarLivroDoArquivo('Livros\Livros.txt')

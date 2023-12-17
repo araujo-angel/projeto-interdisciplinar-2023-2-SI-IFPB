@@ -5,8 +5,6 @@ import signal
 from time import sleep
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from Pedido import *
-import ast
-import datetime
 
 MAX_MESSAGE_SIZE = 1024
 HOST = 'localhost'
@@ -30,14 +28,14 @@ CODIGOS_SERVIDOR = {
     '233': 'Quantidade alterada com sucesso!',
     '400': 'Cliente não encontrado.',
     '401': 'Quantidade não disponível no estoque.',
-    '405': 'Número inválido.',
-    '406': 'ISBN inexistente',
+    '405': 'Dados incorretos, tente novamente.',
+    '406': 'ISBN inválido',
     '440': 'Seu carrinho está vazio.',
     '444': 'Livros esgotados.',
     '480': 'Quantidade inválida para a alteração.'
 }
 
-#PEDIDO
+#Onde o pedido é instanciado (Lista encadeada)
 pedido = Pedido()
 
 
@@ -55,15 +53,13 @@ def main():
     mensagem_servidor = client_socket.recv(MAX_MESSAGE_SIZE).decode()
     print(mensagem_servidor)
 
-    
-
     def enviar_mensagem(mensagem):
         client_socket.send(mensagem.encode())
         return client_socket.recv(MAX_MESSAGE_SIZE).decode()
     
     def ctrl_c_handler(signum, frame):
         print("\nEncerrando o programa.")
-        client_socket.send("QUIT".encode())
+        client_socket.send("SAIR".encode())
         sys.exit(0)
 
     signal.signal(signal.SIGINT, ctrl_c_handler)
@@ -80,7 +76,7 @@ def main():
 
             if choice == '1':
                 cls()
-                _, resposta = enviar_mensagem("GET_BOOKS").split("-", 1)
+                _, resposta = enviar_mensagem("CATALOGO").split("-", 1)
                 print(f'Livros disponíveis:\n{resposta}')
                 isbn = pedido.inputISBN()
                 qtd = pedido.inputQtd()
@@ -95,7 +91,7 @@ def main():
                     compra = pedido.comprarLivro(isbn, titulo, preco, qtd, estoque_disponivel)
                 else:
                     print(CODIGOS_SERVIDOR[codigo])
-                    
+                   
 
             elif choice == '2':
                 cls()
@@ -107,7 +103,7 @@ def main():
                 
                 codigo = resposta[0]
                 
-                # Analisar resposta do servidor após finalizar pedido
+                # Analisa a resposta do servidor após selecionar "finalizar pedido"
                 if codigo == "440" or codigo =="444":
                     # Carrinho vazio ou livros esgotados
                     print(CODIGOS_SERVIDOR[codigo])
@@ -115,16 +111,14 @@ def main():
                     continue
                 elif codigo == "211":
                     print(CODIGOS_SERVIDOR[codigo])
-                    #_, livros_disponiveis = resposta.split('-', 1)
-                    # livros_disponiveis_str = resposta[1]
-                    # livros_disponiveis = ast.literal_eval(livros_disponiveis_str)
+                    
                     livros_disponiveis = resposta[1]
                     
-                    # Pelo menos um livro está disponível
+                    # Mostra apenas os livros disponíveis para a compra
                     print("Livros disponíveis do seu carrinho:")
                     print(livros_disponiveis)
 
-                    # Oferecer escolha ao cliente
+                    # Oferece escolha ao cliente para finalizar a compra
                     escolha = input("Deseja confirmar a compra? (s/n): ").lower()
                     
                     while escolha != 's' and escolha != 'n':
@@ -136,7 +130,7 @@ def main():
                         print(CODIGOS_SERVIDOR[resposta_confirmar])
                         total = client_socket.recv(MAX_MESSAGE_SIZE).decode()
                         print(f"Total: R${total}")
-                        resposta = enviar_mensagem("QUIT")
+                        resposta = enviar_mensagem("SAIR")
                         if resposta == "204":
                             print('Volte sempre!')
                             break
@@ -147,10 +141,9 @@ def main():
                         continue
 
 
-
             elif choice == '4':
                 cls()
-                resposta = enviar_mensagem("QUIT")
+                resposta = enviar_mensagem("SAIR")
                 if resposta == "204":
                     print('Volte sempre!')
                     break
@@ -210,14 +203,17 @@ def menuCarrinho(enviar_mensagem):
             print("\n3 - Voltar")
         
         escolha = input("\nEscolha uma opção: ").lower()
+
+        # Se escolher "Remover livro"
         if escolha == '1' and not pedido.getLista().estaVazia():
             isbn = pedido.inputISBN()
             pedido.removerLivroPorIsbnFor(isbn)
             menuCarrinho(enviar_mensagem)
 
+        # Se escolher "Adicionar livro" quando o carrinho está vazio
         elif (escolha == '1' and pedido.getLista().estaVazia()):
             cls()
-            _, resposta = enviar_mensagem("GET_BOOKS").split("-", 1)
+            _, resposta = enviar_mensagem("CATALOGO").split("-", 1)
             print(f'Livros disponíveis:\n{resposta}')
             isbn = pedido.inputISBN()
             qtd = pedido.inputQtd()
@@ -233,6 +229,7 @@ def menuCarrinho(enviar_mensagem):
             else:
                 print(CODIGOS_SERVIDOR[codigo])
 
+        # Se escolher "Alterar quantidade" no carrinho
         elif (escolha == '2' and not pedido.getLista().estaVazia()):
             isbn = pedido.inputISBN()
             qtd = pedido.inputQtd()
@@ -247,20 +244,7 @@ def menuCarrinho(enviar_mensagem):
                 else:
                     print('Este livro não está no seu carrinho')
 
-
-            # resposta = enviar_mensagem(f"ALTERAR-{quantidade}-{isbn}").split('-')
-            # print(resposta)
-            # if resposta[0] == '233':
-            #     print(CODIGOS_SERVIDOR[resposta[0]])
-            #     titulo = resposta[1]
-            #     preco = resposta[2]
-            #     estoque_disponivel = int(enviar_mensagem(f"QTLIVRO {isbn}"))
-            #     compra = pedido.comprarLivro(isbn, titulo, preco, qtd, estoque_disponivel)
-            # elif resposta[0] == '401' or resposta[0] == '480' or resposta[0] == '406':
-            #     print(CODIGOS_SERVIDOR[resposta[0]])
-        
-
-
+        # Se escolher "Voltar" para o menu inicial
         elif (escolha == '3' and not pedido.getLista().estaVazia()) or (escolha == '2' and pedido.getLista().estaVazia()):
             return
 
