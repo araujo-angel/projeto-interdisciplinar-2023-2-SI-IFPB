@@ -8,7 +8,6 @@ Classe que controla a quantidade de livros da aplicação.
 class EstoqueDeLivros:
     def __init__(self):
         self.__livros = ChainingHashTable()
-        #self.__qtdNoEstoque = 0
 
     def cadastrarLivroDoArquivo(self, nome_arquivo):
         try:
@@ -38,8 +37,6 @@ class EstoqueDeLivros:
     def cadastrarLivro(self, titulo, isbn, autor, qtdDeLivros, preco):
         novoLivro = Livros(titulo, isbn, autor, qtdDeLivros, preco)
         self.__livros.put(novoLivro.getIsbn(), novoLivro)
-        #self.__qtdNoEstoque += qtdDeLivros
-
         return self.__livros.get(isbn)
     
     def verificarLivroCadastrado(self, isbn):
@@ -64,21 +61,15 @@ class EstoqueDeLivros:
         else:
             print(f"Livro com ISBN {isbn} não encontrado no estoque.")
             return False
-    
+
     def decrementarQuantidadeLivros(self, isbn, quantidade):
         try:
             livro = self.__livros.get(isbn)
 
-            if livro:
-                quantidade_atual = livro.getQtdDeLivros()
-                if quantidade_atual >= quantidade:
-                    livro.setQtdDeLivros(quantidade_atual - quantidade)
-                    #self.__qtdNoEstoque -= quantidade
-                    print(f"Quantidade de '{livro.getTitulo()}' decrementada em {quantidade}. Nova quantidade: {livro.getQtdDeLivros()}")
-                else:
-                    print(f"Erro: Não há quantidade suficiente de '{livro.getTitulo()}' para decrementar.")
-            else:
-                print(f"Livro com ISBN {isbn} não encontrado no estoque.")
+            quantidade_atual = livro.getQtdDeLivros()
+
+            livro.setQtdDeLivros(quantidade_atual - quantidade)
+            print(f"Quantidade de '{livro.getTitulo()}' decrementada em {quantidade}. Nova quantidade: {livro.getQtdDeLivros()}")
 
         except Exception as e:
             print(f"Erro ao decrementar a quantidade de livros: {e}")
@@ -87,7 +78,7 @@ class EstoqueDeLivros:
         try:
             with open(nome_arquivo, 'w', encoding='utf-8') as arquivo:
                 for isbn, livro in self.__livros.items():
-                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", "{livro.getPreco()}", {livro.getQtdDeLivros()}\n'
+                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", {livro.getQtdDeLivros()}, {livro.getPreco()}\n'
                     arquivo.write(linha)
 
             print(f"Arquivo {nome_arquivo} atualizado com sucesso.")
@@ -114,9 +105,7 @@ class EstoqueDeLivros:
             return livro.getQtdDeLivros()
         else:
             print(f"Livro com ISBN {isbn} não encontrado no estoque.")
-            return 0  # Ou outro valor que faça sentido no seu contexto
-
-    
+            return 0  
     
     def __str__(self):
         livros_str = "\n".join(str(livro) for livro in self.__livros.values())
