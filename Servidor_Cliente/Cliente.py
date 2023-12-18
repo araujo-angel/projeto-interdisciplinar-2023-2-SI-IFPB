@@ -7,8 +7,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from Pedido import *
 
 MAX_MESSAGE_SIZE = 1024
-HOST = '192.168.199.1'
-PORT = 50000
+HOST = '10.0.61.76'
+PORT = 8000
 
 if len(sys.argv) == 2:
     HOST = sys.argv[1]
@@ -31,7 +31,7 @@ CODIGOS_SERVIDOR = {
     '405': 'Dados incorretos, tente novamente.',
     '406': 'ISBN inválido',
     '440': 'Seu carrinho está vazio.',
-    '444': 'Livros esgotados.',
+    '444': 'Não foi possível comprar a quantidade desejada. ',
     '480': 'Quantidade inválida para a alteração.'
 }
 
@@ -207,7 +207,7 @@ def menuCarrinho(enviar_mensagem):
         # Se escolher "Remover livro"
         if escolha == '1' and not pedido.getLista().estaVazia():
             isbn = pedido.inputISBN()
-            pedido.removerLivroPorIsbnFor(isbn)
+            pedido.removerLivroPorIsbn(isbn)
             menuCarrinho(enviar_mensagem)
 
         # Se escolher "Adicionar livro" quando o carrinho está vazio

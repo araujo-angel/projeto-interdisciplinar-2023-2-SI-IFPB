@@ -295,7 +295,7 @@ class Server:
 if __name__ == '__main__':
     MESSAGE_SIZE = 1024
     HOST = '0.0.0.0'
-    PORT = 40000
+    PORT = 8000
     servidor = Server(HOST, PORT, MESSAGE_SIZE)
     servidor.start()
 

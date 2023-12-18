@@ -47,6 +47,9 @@ class Pedido:
             return False
         
     def obterLivroPorISBN(self, isbn):
+        '''
+        Método que encontra o livro desejado pelo ISBN passado.
+        '''
         if not self.__pedido.estaVazia():
             try:
                 for i, pedidoLocal in enumerate(self.__pedido):
@@ -106,8 +109,15 @@ class Pedido:
             info = [isbn, titulo, preco, qtd]
             self.__pedido.append(info)
             return self.__pedido
+        else:                
+            info = [isbn, titulo, preco, qtd]
+            self.__pedido.append(info)
+            return self.__pedido
     
-    def removerLivroPorIsbnFor(self, isbn):
+    def removerLivroPorIsbn(self, isbn):
+        '''
+        Remove livro pelo ISBN passado.
+        '''
         #Remove um livro do pedido com base no ISBN. Retorna True se removido com sucesso, False se o ISBN não for encontrado.
         for i, pedidoLocal in enumerate(self.__pedido):
             if pedidoLocal[0] == isbn:
@@ -116,6 +126,9 @@ class Pedido:
         return False
     
     def alterarQuantidadeDoPedido(self, isbn, quantidade):
+        '''
+        Método que altera a quantidade desejada do livro.
+        '''
         for i, pedidoLocal in enumerate(self.__pedido):
             if pedidoLocal[0] == isbn:
                 pedidoLocal[3] = quantidade
@@ -124,6 +137,9 @@ class Pedido:
     
     
     def calcularPrecoTotal(self):   
+        '''
+        Calcula o preco total do pedido feito.
+        '''
         total = 0
         for pedidoLocal in self.__pedido:
             total += int(pedidoLocal[2]) * int(pedidoLocal[3])
