@@ -1,6 +1,4 @@
-#from DataStructure.ListaSimplesmenteEncadeada import *
 from DataStructure.ListaEncadeada import *
-#from DataStructure.ListaEncadeadaOrdenada import *
 from Livros.EstoqueDeLivros import *
 
 
@@ -18,13 +16,9 @@ class Pedido:
     """
     def __init__(self):
         self.__pedido = Lista()
-        self.__id = 0
 
     def getLista(self):
         return self.__pedido
-
-    def getId(self):
-        return self.__id
 
     def inputISBN(self):
         while True:
@@ -37,10 +31,10 @@ class Pedido:
     def inputQtd(self):
         while True:
             qtdLivros = input("Digite a quantidade desejada: ")
-            if qtdLivros.isdigit():
+            if qtdLivros.isdigit() and int(qtdLivros)>0:
                 return qtdLivros
             else:
-                print("Entrada inválida. Digite apenas números.")  
+                print("Entrada inválida. Digite apenas números maiores que zero")  
 
     def livroExistente(self,isbn):
         """
@@ -52,7 +46,6 @@ class Pedido:
         except ListaException:
             return False
         
-
     def obterLivroPorISBN(self, isbn):
         if not self.__pedido.estaVazia():
             try:
@@ -67,7 +60,6 @@ class Pedido:
         else:
             return None
             
-        
     def obterQuantidadeDeLivroNoPedido(self, isbn):
         """
         Verifica a 'Quantidade' do livro com o ISBN fornecido
@@ -78,7 +70,18 @@ class Pedido:
                     return pedidoLocal[3]
         except ListaException:
             return None
+        
+    def quantidadeISBNsDiferentes(self):
+        """
+        Retorna a quantidade de ISBNs diferentes na lista de pedidos.
+        """
+        isbn_set = set()
+        for i, pedidoLocal in enumerate(self.__pedido):
+            isbn = pedidoLocal[0]
+            if isbn not in isbn_set:
+                isbn_set.add(isbn)
 
+        return len(isbn_set)
 
     def comprarLivro(self, isbn, titulo, preco, qtd, estoqueDisponivel):
         isbn = isbn
@@ -91,15 +94,23 @@ class Pedido:
             # ISBN já existe na self.__pedido, incrementa a quantidade
             
             quantidade_atual = self.obterQuantidadeDeLivroNoPedido(isbn)
-            
-            if int(quantidade_atual) + int(qtd) > int(estoqueDisponivel):
+
+            if int(qtd) <= int(estoqueDisponivel):
+                for i, pedidoLocal in enumerate(self.__pedido):
+                    if pedidoLocal[0] == isbn:
+                        pedidoLocal[3] = int(qtd)
+            else:
                 print("Quantidade desejada não disponível em estoque.")
                 return
-            for i, pedidoLocal in enumerate(self.__pedido):
-                if pedidoLocal[0] == isbn:
-                    pedidoLocal[3] = int(qtd) + int(quantidade_atual)
-                    print(f"Quantidade do livro com ISBN {isbn} incrementada para {pedidoLocal[3]}.")
-            return self.__pedido
+            
+            # if int(quantidade_atual) + int(qtd) > int(estoqueDisponivel):
+            #     print("Quantidade desejada não disponível em estoque.")
+            #     return
+            # for i, pedidoLocal in enumerate(self.__pedido):
+            #     if pedidoLocal[0] == isbn:
+            #         pedidoLocal[3] = int(qtd) + int(quantidade_atual)
+            #         print(f"Quantidade do livro com ISBN {isbn} incrementada para {pedidoLocal[3]}.")
+            # return self.__pedido
         else:
             info = [isbn, titulo, preco, qtd]
             self.__pedido.append(info)
@@ -116,6 +127,14 @@ class Pedido:
                 return True
         return False
     
+    def alterarQuantidadeDoPedido(self, isbn, quantidade):
+        for i, pedidoLocal in enumerate(self.__pedido):
+            if pedidoLocal[0] == isbn:
+                pedidoLocal[3] = quantidade
+                return True
+        return False
+    
+    
     def calcularPrecoTotal(self):   
         total = 0
         for pedidoLocal in self.__pedido:
@@ -123,36 +142,6 @@ class Pedido:
         return total
 
 
-
-    # def menuCarrinho(self):
-    #     print('*****Carrinho*****')
-    #     if self.__pedido.estaVazia():
-    #         print("Seu carrinho está vazio! Adicione um livro!")
-    #         print("\n1 - Adicionar livro")
-    #         print("\n2 - Voltar")
-    #     else:
-    #         for i, pedido in enumerate(self.__pedido, start=1):
-    #             info = pedido[next(iter(pedido))]  
-                
-    #             print(f"{i}. 'ISBN': '{info['ISBN']}', 'Título': '{info['Título']}', 'Preço': '{info['Preço']}', 'Quantidade': '{info['Quantidade']}'")
-
-    #         print(f'Total: {self.calcularPrecoTotal(self.__pedido)}')
-    #         print("\n1 - Remover livro")
-    #         print("\n2 - Adicionar livro")
-    #         print("\n3 - Voltar")
-        
-    #     escolha = input("\nEscolha uma opção: ").lower()
-    #     if escolha == '1' and len(self.__pedido) != 0:
-    #         isbn = self.inputISBN()
-    #         self.removerLivroPorISBN(self.__pedido, isbn)
-    #         self.menuCarrinho(enviar_mensagem, self.__pedido)
-    #     elif (escolha == '2' and len(self.__pedido) != 0) or (escolha == '1' and len(self.__pedido) == 0):
-    #         _, resposta = enviar_mensagem("GET_BOOKS").split("-", 1)
-    #         print(f'Livros disponíveis:\n{resposta}')
-    #         compra = self.comprarLivro(enviar_mensagem, self.__pedido)
-    #     elif (escolha == '3' and len(self.__pedido) != 0) or (escolha == '2' and len(self.__pedido) == 0):
-    #         return
-
     def __str__(self) -> str:
-        return f'Pedido {self.__id}: {self.__pedido}'
+        return f'Pedidos: {self.__pedido}'
     

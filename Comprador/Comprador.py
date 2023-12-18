@@ -27,7 +27,7 @@ class Comprador:
         return self.__telefone
 
     def getCep(self):
-        return self.__pagamento
+        return self.__cep
 
     def setCpf(self, novoCpf):
         self.__cpf = novoCpf

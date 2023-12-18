@@ -1,20 +1,13 @@
 from Livros.Livro import *
 from DataStructure.ChainingHashTable import *
 
-class EstoqueLivrosException(Exception):
-    """Classe de exceção lançada quando uma violação de ordem genérica
-    da classe EstoqueDeLivros é identificada.
-    """
-    def __init__(self,msg):
-        super().__init__(msg)
+"""
+Classe que controla a quantidade de livros da aplicação.
+"""
 
 class EstoqueDeLivros:
-    """
-    Classe que controla a quantidade de livros da aplicação.
-    """
     def __init__(self):
         self.__livros = ChainingHashTable()
-        #self.__qtdNoEstoque = 0
 
     def cadastrarLivroDoArquivo(self, nome_arquivo):
         try:
@@ -35,17 +28,15 @@ class EstoqueDeLivros:
                     # Chamar o método cadastrarLivro para cada linha
                     resultado = self.cadastrarLivro(titulo, isbn, autor, qtdDeLivros, preco)
                     print(resultado)
-            print("Cadastro de livros concluído.")
 
-        except:
-            raise EstoqueLivrosException(f"Erro ao ler o arquivo: {nome_arquivo}")
+            print("Cadastro de livros concluído.")
+        except Exception as e:
+            print(f"Erro ao ler o arquivo: {e}")
  
 
     def cadastrarLivro(self, titulo, isbn, autor, qtdDeLivros, preco):
         novoLivro = Livros(titulo, isbn, autor, qtdDeLivros, preco)
         self.__livros.put(novoLivro.getIsbn(), novoLivro)
-        #self.__qtdNoEstoque += qtdDeLivros
-
         return self.__livros.get(isbn)
     
     def verificarLivroCadastrado(self, isbn):
@@ -62,45 +53,43 @@ class EstoqueDeLivros:
             quantidadeDisponivel = livro.getQtdDeLivros()
 
             if quantidadeDisponivel >= quantidadeDesejada:
+                print(f"Quantidade desejada de '{livro.getTitulo()}' disponível no estoque.")
                 return True
             else:
+                print(f"Erro: Não há quantidade suficiente de '{livro.getTitulo()}' no estoque.")
                 return False
         else:
-            raise EstoqueLivrosException(f"Livro com ISBN {isbn} não encontrado no estoque.")
-    
+            print(f"Livro com ISBN {isbn} não encontrado no estoque.")
+            return False
+
     def decrementarQuantidadeLivros(self, isbn, quantidade):
         try:
             livro = self.__livros.get(isbn)
 
-            if livro:
-                quantidade_atual = livro.getQtdDeLivros()
-                if quantidade_atual >= quantidade:
-                    livro.setQtdDeLivros(quantidade_atual - quantidade)
-                    print(f"Quantidade de '{livro.getTitulo()}' decrementada em {quantidade}. Nova quantidade: {livro.getQtdDeLivros()}")
-                else:
-                    raise EstoqueLivrosException(f"Erro: Não há quantidade suficiente de '{livro.getTitulo()}' para decrementar.")
-            else:
-                raise EstoqueLivrosException(f"Livro com ISBN {isbn} não encontrado no estoque.")
+            quantidade_atual = livro.getQtdDeLivros()
 
-        except:
-            raise EstoqueLivrosException(f"Erro ao decrementar a quantidade de livros: {isbn}")
+            livro.setQtdDeLivros(quantidade_atual - quantidade)
+            print(f"Quantidade de '{livro.getTitulo()}' decrementada em {quantidade}. Nova quantidade: {livro.getQtdDeLivros()}")
+
+        except Exception as e:
+            print(f"Erro ao decrementar a quantidade de livros: {e}")
 
     def atualizarArquivoLivros(self, nome_arquivo):
         try:
             with open(nome_arquivo, 'w', encoding='utf-8') as arquivo:
                 for isbn, livro in self.__livros.items():
-                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", "{livro.getPreco()}", {livro.getQtdDeLivros()}\n'
+                    linha = f'"{livro.getTitulo()}", {isbn}, "{livro.getAutor()}", {livro.getQtdDeLivros()}, {livro.getPreco()}\n'
                     arquivo.write(linha)
 
             print(f"Arquivo {nome_arquivo} atualizado com sucesso.")
-        except:
-            raise EstoqueLivrosException(f"Erro ao atualizar o arquivo: {nome_arquivo}")
+        except Exception as e:
+            print(f"Erro ao atualizar o arquivo: {e}")
 
     def catalogo(self):
         # Lista para armazenar as strings representando cada livro no catálogo
         catalogo = []
         for livro in self.__livros.values():
-            info_livro = f"ISBN: {livro.getIsbn()}, Título: {livro.getTitulo()}, Autor: {livro.getAutor()}, Preço: {livro.getPreco()}\n"
+            info_livro = f"ISBN: {livro.getIsbn()}, Título: {livro.getTitulo()}, Autor: {livro.getAutor()}, Preço: {livro.getPreco()}, Quantidade: {livro.getQtdDeLivros()}\n"
             catalogo.append(info_livro)
 
         return catalogo
@@ -115,8 +104,8 @@ class EstoqueDeLivros:
         if livro:
             return livro.getQtdDeLivros()
         else:
-            raise EstoqueLivrosException(f"Livro com ISBN {isbn} não encontrado no estoque.")
-
+            print(f"Livro com ISBN {isbn} não encontrado no estoque.")
+            return 0  
     
     def __str__(self):
         livros_str = "\n".join(str(livro) for livro in self.__livros.values())

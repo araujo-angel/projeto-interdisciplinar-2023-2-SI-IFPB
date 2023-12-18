@@ -2,26 +2,41 @@ Documentação do protocolo de aplicação Biblion, referente ao sistema de comp
 Nele, utilizamos como Protocolo da camada de Transporte o TCP, como também trabalhamos com Threads.
 
 As mensagens descritas abaixo são enviadas pelo cliente ao servidor através do método enviar_msg.
-O servidor processa as mensagens recebidas através do método processa_msg.
-O servidor envia as respostas ao cliente utilizando o método send to socket.
+O servidor processa as mensagens recebidas através do método accept_connections.
 
-GET_BOOKS <livro> - Solicita ao servidor o catálogo de livros.
+O servidor envia as respostas ao cliente utilizando o método handle_client.
+
+VALIDAR <cliente> - Valida se o cliente já está cadastrado na loja.
+Parâmetros: número do cpf.
+200: Cliente encontrado com sucesso!
+400: Cliente não encontrado.
+
+CATALOGO <livro> - Solicita ao servidor o catálogo de livros.
 Parâmetros: Número com a quantidade de livros.
-Resposta do Servidor: 201 - Pode realizar a compra. 
-
-BUY_SUCCESS <numero> - Solicita ao servidor a compra de um ou mais livros.
-Parâmetros:
 Resposta do Servidor: 
-200 - Cliente encontrado com sucesso!
-201 - Pedido adicionado ao carrinho com sucesso!
-203 - Exibir catálogo.
-205 - Pedido feito com sucesso!
-400 - Cliente não encontrado.
-401 - Este livro não está disponível no estoque.
-405 - Número inválido.
-406 - ISBN inexistente.
+201 - Pode realizar a compra. 
+203: Catálogo enviado.
 
-QUIT - Solicita ao servidor encerrar a conexão.
+COMPRAR <numero> - Solicita ao servidor a compra de um ou mais livros.
+201: Pedido adicionado ao carrinho com sucesso!
+203: Catálogo enviado
+205: Pedido registrado com sucesso!,
+233: Quantidade alterada com sucesso!
+401: Quantidade não disponível no estoque.
+405: Dados incorretos, tente novamente.
+406: ISBN Inválido
+480: Quantidade inválida para a alteração.
+
+QTLIVRO - Verifica a quantidade de livros
+401: Quantidade não disponível no estoque.
+
+FINALIZAR - Finaliza a compra
+206: Compra finalizada com sucesso!
+207: Compra cancelada.
+211: Confira seu pedido.
+440: Seu carrinho está vazio.
+444: Livros esgotados.
+
+SAIR - Solicita ao servidor encerrar a conexão.
 Parâmetros: Nenhum.
 Resposta do Servidor: 204 - Desconexão efetuada com sucesso.
-
