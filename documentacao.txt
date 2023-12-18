@@ -35,7 +35,7 @@ FINALIZAR - Finaliza a compra
 207: Compra cancelada.
 211: Confira seu pedido.
 440: Seu carrinho está vazio.
-444: Livros esgotados.
+444: Não foi possível comprar a quantidade desejada.
 
 SAIR - Solicita ao servidor encerrar a conexão.
 Parâmetros: Nenhum.
