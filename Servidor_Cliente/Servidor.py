@@ -8,7 +8,6 @@ from DataStructure.ListaEncadeada import *
 from Comprador.CompradoresCadastrados import *
 from Pedido import *
 import ast
-#import signal
 
 class Server:
     '''
@@ -29,7 +28,6 @@ class Server:
     def start(self):
         self.prepararEstoque()
         self.prepararCompradores()
-
 
         self.__server_socket.bind((self.__host, self.__port))
         self.__server_socket.listen(1)
