@@ -7,8 +7,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from Pedido import *
 
 MAX_MESSAGE_SIZE = 1024
-HOST = 'localhost'
-PORT = 40000
+HOST = '192.168.199.1'
+PORT = 50000
 
 if len(sys.argv) == 2:
     HOST = sys.argv[1]
