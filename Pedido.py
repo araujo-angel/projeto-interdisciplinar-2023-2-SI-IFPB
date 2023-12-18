@@ -103,24 +103,12 @@ class Pedido:
                 print("Quantidade desejada não disponível em estoque.")
                 return
             
-            # if int(quantidade_atual) + int(qtd) > int(estoqueDisponivel):
-            #     print("Quantidade desejada não disponível em estoque.")
-            #     return
-            # for i, pedidoLocal in enumerate(self.__pedido):
-            #     if pedidoLocal[0] == isbn:
-            #         pedidoLocal[3] = int(qtd) + int(quantidade_atual)
-            #         print(f"Quantidade do livro com ISBN {isbn} incrementada para {pedidoLocal[3]}.")
-            # return self.__pedido
-        else:
             info = [isbn, titulo, preco, qtd]
             self.__pedido.append(info)
             return self.__pedido
     
     def removerLivroPorIsbnFor(self, isbn):
-        """
-        Remove um livro do pedido com base no ISBN.
-        Retorna True se removido com sucesso, False se o ISBN não for encontrado.
-        """
+        #Remove um livro do pedido com base no ISBN. Retorna True se removido com sucesso, False se o ISBN não for encontrado.
         for i, pedidoLocal in enumerate(self.__pedido):
             if pedidoLocal[0] == isbn:
                 self.__pedido.remover(i+1)
