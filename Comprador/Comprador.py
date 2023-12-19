@@ -1,5 +1,3 @@
-from DataStructure.ChainingHashTable import *
-
 class CompradorException(Exception):
     '''
     Classe referente ao tratamento de erros.
