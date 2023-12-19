@@ -84,18 +84,17 @@ class Server:
 
 
     def validarCliente(self, client_socket, msg_client):
-        with self.__lock_compradores:
-            _, cpf = msg_client.split()
-            if self.__compradores.verificarClienteCadastrado(cpf):
-                print(f'Cliente conseguiu validar o CPF: {cpf}')
-                resposta = "200"
-                client_socket.send(resposta.encode())
-                return cpf
-            else:
-                print(f'Cliente não conseguiu validar o CPF: {cpf}')
-                resposta = "400"
-                client_socket.send(resposta.encode())
-                return cpf
+        _, cpf = msg_client.split()
+        if self.__compradores.verificarClienteCadastrado(cpf):
+            print(f'Cliente conseguiu validar o CPF: {cpf}')
+            resposta = "200"
+            client_socket.send(resposta.encode())
+            return cpf
+        else:
+            print(f'Cliente não conseguiu validar o CPF: {cpf}')
+            resposta = "400"
+            client_socket.send(resposta.encode())
+            return cpf
 
     def comprarLivro(self, client_socket, cpfCliente, msg_client):
         with self.__lock_livros:
@@ -127,34 +126,32 @@ class Server:
             client_socket.send(resposta.encode())
 
     def quantidadeLivro(self, client_socket, cpfCliente, msg_client):
-        with self.__lock_livros:
-            _, isbn = msg_client.split()
+        _, isbn = msg_client.split()
 
-            print(f'Cliente do CPF {cpfCliente} quer verificar a quantidade em estoque do livro do ISBN {isbn}')
-            try:
-                isbn = int(isbn)
-            except ValueError:
-                resposta = "405"  # Dados incorretos, tente novamente.
-                client_socket.send(resposta.encode())
-                return
-            
-            if self.__estoque.verificarLivroCadastrado(isbn):
-                    qtLivro = self.__estoque.obterQuantidadeLivro(isbn)
-                    resposta = str(qtLivro)
-                
-            else:
-                print(f'Cliente do CPF {cpfCliente} digitou um ISBN inválido: {isbn}')
-                resposta = "406"  # ISBN inválido
-                client_socket.send(resposta.encode())
-                return
-
+        print(f'Cliente do CPF {cpfCliente} quer verificar a quantidade em estoque do livro do ISBN {isbn}')
+        try:
+            isbn = int(isbn)
+        except ValueError:
+            resposta = "405"  # Dados incorretos, tente novamente.
             client_socket.send(resposta.encode())
+            return
+        
+        if self.__estoque.verificarLivroCadastrado(isbn):
+                qtLivro = self.__estoque.obterQuantidadeLivro(isbn)
+                resposta = str(qtLivro)
+            
+        else:
+            print(f'Cliente do CPF {cpfCliente} digitou um ISBN inválido: {isbn}')
+            resposta = "406"  # ISBN inválido
+            client_socket.send(resposta.encode())
+            return
+
+        client_socket.send(resposta.encode())
 
     def exibirCatalogo(self, client_socket):
-        with self.__lock_livros:
-            catalogo = self.__estoque.catalogo()
-            resposta = f"203-" + "\n".join(catalogo)
-            client_socket.send(resposta.encode())
+        catalogo = self.__estoque.catalogo()
+        resposta = f"203-" + "\n".join(catalogo)
+        client_socket.send(resposta.encode())
 
     def finalizarPedido(self, cpfCliente, client_socket, msg_client):
         with self.__lock_compradores:
