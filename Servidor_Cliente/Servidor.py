@@ -31,7 +31,7 @@ class Server:
 
         self.__server_socket.bind((self.__host, self.__port))
         self.__server_socket.listen(1)
-        print(f"Servidor aguardando conexões em {self.__host}:{self.__port}")
+        print(f"\nServidor aguardando conexões em {self.__host}:{self.__port}")
         
         try:
             self.accept_connections()
@@ -57,7 +57,7 @@ class Server:
             try:
                 msg_client = client_socket.recv(self.__max_message_size).decode()
             except ConnectionResetError:
-                print("Cliente", client_socket.getpeername(), "desconectou!")
+                print("Cliente", client_socket.getpeername(), "desconectou!\n")
                 break
 
             if msg_client.startswith("VALIDAR"):
@@ -99,7 +99,7 @@ class Server:
     def comprarLivro(self, client_socket, cpfCliente, msg_client):
         with self.__lock_livros:
             _, isbn, quantidade = msg_client.split()
-            print(f'Cliente do CPF {cpfCliente} quer comprar {quantidade} livro(s) do ISBN {isbn}')
+            
             try:
                 isbn = int(isbn)
                 quantidade = int(quantidade)
@@ -115,6 +115,7 @@ class Server:
                     titulo = livro.getTitulo()
                     preco = livro.getPreco()
                     resposta = f"201-{titulo}-{preco}"  # Pedido adicionado ao carrinho com sucesso!
+                    print(f'Cliente do CPF {cpfCliente} adicionou ao carrinho {quantidade} livro(s) do ISBN {isbn}')
                 else:
                     resposta = "401"  # Quantidade insuficiente em estoque
             else:
@@ -128,7 +129,6 @@ class Server:
     def quantidadeLivro(self, client_socket, cpfCliente, msg_client):
         _, isbn = msg_client.split()
 
-        print(f'Cliente do CPF {cpfCliente} quer verificar a quantidade em estoque do livro do ISBN {isbn}')
         try:
             isbn = int(isbn)
         except ValueError:
@@ -165,7 +165,6 @@ class Server:
                 listaPedidos = ast.literal_eval(listaDePedidos)
             else:
                 listaPedidos = ''
-            print(listaPedidos)
 
             if not listaPedidos or tam <= 0:
                 # Lista de pedidos está vazia
@@ -184,13 +183,9 @@ class Server:
                 for i, pedidoLocal in enumerate(listaPedidos):
 
                     isbn = pedidoLocal[0]
-                    print("ISBN:", isbn)
-                    print(isbn)
                     titulo = pedidoLocal[1]
                     preco = pedidoLocal[2]
                     quantidade = pedidoLocal[3]
-                    print("Quantidade:", quantidade)
-                    print(quantidade)
 
                     try:
                         isbn = int(isbn)
@@ -258,7 +253,8 @@ class Server:
                     #Atualizar arquivo de texto do estoque
                     self.__estoque.atualizarArquivoLivros('Livros\Livros.txt')
 
-                    print(f"Cliente do CPF: {cpfCliente} finalizou sua compra!")
+                    print(f"\nCliente do CPF: {cpfCliente} finalizou sua compra!")
+                    print(f"Pedidos realizados hoje:\n{self.__pedidos}")
                     enviar = "206" # Compra finalizada com sucesso!
                     client_socket.send(enviar.encode())
                     client_socket.send(str(total).encode())

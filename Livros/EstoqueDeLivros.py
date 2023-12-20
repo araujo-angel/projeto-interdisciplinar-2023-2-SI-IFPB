@@ -36,7 +36,7 @@ class EstoqueDeLivros:
                     resultado = self.cadastrarLivro(titulo, isbn, autor, qtdDeLivros, preco)
                     print(resultado)
 
-            print("Cadastro de livros concluído.")
+            print("Cadastro de livros concluído.\n")
         except FileNotFoundError:
             raise EstoqueDeLivrosException(f"Erro ao ler o arquivo: {nome_arquivo}")
  
@@ -63,7 +63,7 @@ class EstoqueDeLivros:
                 print(f"Quantidade desejada de '{livro.getTitulo()}' disponível no estoque.")
                 return True
             else:
-                print(f"Erro: Não há quantidade suficiente de '{livro.getTitulo()}' no estoque.")
+                print(f"Não há quantidade suficiente de '{livro.getTitulo()}' no estoque.")
                 return False
         else:
             print(f"Livro com ISBN {isbn} não encontrado no estoque.")
@@ -116,4 +116,4 @@ class EstoqueDeLivros:
     
     def __str__(self):
         livros_str = "\n".join(str(livro) for livro in self.__livros.values())
-        return f"Quantidade no Estoque: {self.__livros.__len__()}\nLivros no Estoque:\n{livros_str}"
+        return f"Títulos no Estoque: {self.__livros.__len__()}\nLivros no Estoque:\n{livros_str}"
