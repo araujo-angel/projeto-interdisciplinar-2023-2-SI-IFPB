@@ -38,7 +38,7 @@
 | Servidor.py | Este é o arquivo onde está o servidor.|
 | Cliente.py | Este é o arquivo onde está o Cliente.|
 | Pedido.py | Este é o arquivo acerca da compra e remoção de um pedido pelo cliente.|
-| Documentacao.txt | Neste arquivo existe a documentação respectiva à disciplina de Protocolos de Rede.|
+| Documentacao.txt | Neste arquivo está a documentação referente à disciplina de Protocolos de Rede.|
 
 
 ### 📝 Alunas
