@@ -1,6 +1,13 @@
 from DataStructure.ChainingHashTable import *
 from Comprador.Comprador import *
 
+class CompradoresCadastradosException(Exception):
+    '''
+    Classe referente ao tratamento de erros.
+    '''
+    def __init__(self, msg):
+        super().__init__(msg)
+
 class CompradoresCadastrados:
     def __init__(self):
         self.__compradores = ChainingHashTable()
@@ -25,8 +32,8 @@ class CompradoresCadastrados:
                     print(resultado)
 
             print("Cadastro de compradores concluído.")
-        except Exception as e:
-            print(f"Erro ao ler o arquivo: {e}")
+        except FileNotFoundError:
+            raise CompradoresCadastradosException(f"Erro ao ler o arquivo: {nome_arquivo}")
     
     def cadastrarComprador(self, cpf, nome, telefone, cep):
         novoComprador = Comprador(cpf, nome, telefone, cep)

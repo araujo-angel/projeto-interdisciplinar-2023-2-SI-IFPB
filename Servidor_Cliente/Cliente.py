@@ -21,18 +21,15 @@ CODIGOS_SERVIDOR = {
     '201': 'Pedido adicionado ao carrinho com sucesso!',
     '203': 'Catálogo enviado.',
     '204': 'Desconexão efetuada com sucesso!',
-    '205': 'Pedido registrado com sucesso!',
     '206': 'Compra finalizada com sucesso!',
     '207': 'Compra cancelada.',
     '211': 'Confira seu pedido.',
-    '233': 'Quantidade alterada com sucesso!',
     '400': 'Cliente não encontrado.',
     '401': 'Quantidade não disponível no estoque.',
     '405': 'Dados incorretos, tente novamente.',
     '406': 'ISBN inválido',
     '440': 'Seu carrinho está vazio.',
     '444': 'Não foi possível comprar a quantidade desejada. ',
-    '480': 'Quantidade inválida para a alteração.'
 }
 
 #Onde o pedido é instanciado (Lista encadeada)
@@ -105,7 +102,7 @@ def main():
                 
                 # Analisa a resposta do servidor após selecionar "finalizar pedido"
                 if codigo == "440" or codigo =="444":
-                    # Carrinho vazio ou livros esgotados
+                    # Carrinho vazio ou quantidade desejada não disponível
                     print(CODIGOS_SERVIDOR[codigo])
                     sleep(2)
                     continue

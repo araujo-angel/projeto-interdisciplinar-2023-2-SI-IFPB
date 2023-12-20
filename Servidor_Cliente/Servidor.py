@@ -137,8 +137,9 @@ class Server:
             return
         
         if self.__estoque.verificarLivroCadastrado(isbn):
-                qtLivro = self.__estoque.obterQuantidadeLivro(isbn)
-                resposta = str(qtLivro)
+                with self.__lock_livros:
+                    qtLivro = self.__estoque.obterQuantidadeLivro(isbn)
+                    resposta = str(qtLivro)
             
         else:
             print(f'Cliente do CPF {cpfCliente} digitou um ISBN inválido: {isbn}')
@@ -268,8 +269,8 @@ class Server:
                     client_socket.send(enviar.encode())
                     return
             else:
-                # Nenhum livro está disponível, enviar código 444
-                enviar = "444" # Livros esgotados.
+                # A quantidade do livro não está disponível, enviar código 444
+                enviar = "444" #Não foi possível comprar a quantidade desejada.
                 client_socket.send(enviar.encode())
  
 

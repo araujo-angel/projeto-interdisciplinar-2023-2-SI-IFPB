@@ -1,11 +1,18 @@
 from Livros.Livro import *
 from DataStructure.ChainingHashTable import *
 
-"""
-Classe que controla a quantidade de livros da aplicação.
-"""
+
+class EstoqueDeLivrosException(Exception):
+    '''
+    Classe referente ao tratamento de erros.
+    '''
+    def __init__(self, msg):
+        super().__init__(msg)
 
 class EstoqueDeLivros:
+    """
+    Classe que controla a quantidade de livros da aplicação.
+    """
     def __init__(self):
         self.__livros = ChainingHashTable()
 
@@ -30,8 +37,8 @@ class EstoqueDeLivros:
                     print(resultado)
 
             print("Cadastro de livros concluído.")
-        except Exception as e:
-            print(f"Erro ao ler o arquivo: {e}")
+        except FileNotFoundError:
+            raise EstoqueDeLivrosException(f"Erro ao ler o arquivo: {nome_arquivo}")
  
 
     def cadastrarLivro(self, titulo, isbn, autor, qtdDeLivros, preco):
@@ -71,8 +78,8 @@ class EstoqueDeLivros:
             livro.setQtdDeLivros(quantidade_atual - quantidade)
             print(f"Quantidade de '{livro.getTitulo()}' decrementada em {quantidade}. Nova quantidade: {livro.getQtdDeLivros()}")
 
-        except Exception as e:
-            print(f"Erro ao decrementar a quantidade de livros: {e}")
+        except:
+            raise EstoqueDeLivros(f"Erro ao decrementar a quantidade de livros.")
 
     def atualizarArquivoLivros(self, nome_arquivo):
         try:
@@ -82,14 +89,14 @@ class EstoqueDeLivros:
                     arquivo.write(linha)
 
             print(f"Arquivo {nome_arquivo} atualizado com sucesso.")
-        except Exception as e:
-            print(f"Erro ao atualizar o arquivo: {e}")
+        except:
+            raise EstoqueDeLivrosException(f"Erro ao atualizar o arquivo: {nome_arquivo}")
 
     def catalogo(self):
         # Lista para armazenar as strings representando cada livro no catálogo
         catalogo = []
         for livro in self.__livros.values():
-            info_livro = f"ISBN: {livro.getIsbn()}, Título: {livro.getTitulo()}, Autor: {livro.getAutor()}, Preço: {livro.getPreco()}, Quantidade: {livro.getQtdDeLivros()}\n"
+            info_livro = f"ISBN: {livro.getIsbn()}, Título: {livro.getTitulo()}, Autor: {livro.getAutor()}, Preço: {livro.getPreco()}\n"
             catalogo.append(info_livro)
 
         return catalogo
