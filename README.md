@@ -27,18 +27,18 @@
 ## Descrição do arquivo
 | Nome | Descrição |
 | ------ | ----------- |
-| Comprador.py | Neste é o arquivo existe uma classe Comprador, com seus respectivos métodos.|
-| CompradoresCadastrados.py | Neste é o arquivo existe uma classe CompradoresCadastrados, com seus respectivos métodos.|
+| Comprador.py | Neste arquivo existe uma classe Comprador, com seus respectivos métodos.|
+| CompradoresCadastrados.py | Neste arquivo existe uma classe CompradoresCadastrados, com seus respectivos métodos.|
 | Compradores.txt | Este é o arquivo onde os compradores cadastrados estão armazenados.|
 | ListaEncadeada.py | Este é o arquivo onde a estrutura de dados lista é definida. Esta estrutura de dados é utilizada no Pedido.py e Servidor.py. |
 | ChainingHashTable.py | Este é o arquivo onde a estrutura de dados hash é definida. Esta estrutura de dados é utilizada no EstoqueDeLivros.py e CompradoresCadastrados.py. |
 | EstoqueDeLivros.py | Este é o arquivo onde os livros são carregados.|
-| Livro.py | Neste é o arquivo existe uma classe Livro, com seus respectivos métodos.|
+| Livro.py | Neste arquivo existe uma classe Livro, com seus respectivos métodos.|
 | Livros.txt | Este é o arquivo onde os livros estão armazenados.|
 | Servidor.py | Este é o arquivo onde está o servidor.|
 | Cliente.py | Este é o arquivo onde está o Cliente.|
 | Pedido.py | Este é o arquivo acerca da compra e remoção de um pedido pelo cliente.|
-| Documentacao.txt | Neste arquivo existe a documentação respequitiva a disciplina de Protocolos de Rede.|
+| Documentacao.txt | Neste arquivo existe a documentação respectiva à disciplina de Protocolos de Rede.|
 
 
 ### 📝 Alunas
